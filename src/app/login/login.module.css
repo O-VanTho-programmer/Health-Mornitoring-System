@@ -1,26 +1,29 @@
-body{
+.container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #4070f4;
 }
-.wrapper{
+
+.wrapper {
   position: relative;
   max-width: 430px;
   width: 100%;
   background: #fff;
   padding: 34px;
   border-radius: 6px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
-.wrapper h2{
+
+.wrapper h2 {
   position: relative;
   font-size: 22px;
   font-weight: 600;
   color: #333;
 }
-.wrapper h2::before{
+
+.wrapper h2::before {
   content: '';
   position: absolute;
   left: 0;
@@ -30,14 +33,17 @@ body{
   border-radius: 12px;
   background: #4070f4;
 }
-.wrapper form{
+
+.wrapper form {
   margin-top: 30px;
 }
-.wrapper form .input-box{
+
+.wrapper form .inputBox { 
   height: 52px;
   margin: 18px 0;
 }
-form .input-box input{
+
+.inputBox input {
   height: 100%;
   width: 100%;
   outline: none;
@@ -50,57 +56,46 @@ form .input-box input{
   border-radius: 6px;
   transition: all 0.3s ease;
 }
-.input-box input:focus,
-.input-box input:valid{
+
+.inputBox input:focus,
+.inputBox input:valid {
   border-color: #4070f4;
 }
-.policy{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
-.policy label{
-    color: #707070;
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 10px;
-}
-
-.policy .choose{
-    display: flex;
-}
-
-.choose div{
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-form h3{
-  color: #707070;
-  font-size: 14px;
-  font-weight: 500;
-}
-.input-box.button input{
+.inputBox.button input {
   color: #fff;
   letter-spacing: 1px;
   border: none;
   background: #4070f4;
   cursor: pointer;
 }
-.input-box.button input:hover{
+
+.inputBox.button input:hover {
   background: #0e4bf1;
 }
-form .text h3{
- color: #333;
- width: 100%;
- text-align: center;
+
+.text h3 {
+  color: #333;
+  width: 100%;
+  text-align: center;
 }
-form .text h3 a{
+
+.text h3 a {
   color: #4070f4;
   text-decoration: none;
 }
-form .text h3 a:hover{
+
+.text h3 a:hover {
   text-decoration: underline;
+}
+
+.policy{
+  display: flex;
+  justify-content: space-between;
+  color: black;
+}
+
+.choose{
+  display: flex;
+  gap: 10px;
 }
