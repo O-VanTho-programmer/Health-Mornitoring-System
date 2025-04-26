@@ -1,21 +1,54 @@
 <!DOCTYPE html>
-<html>
+<!-- Coding By CodingNepal - codingnepalweb.com -->
+<html lang="en" dir="ltr">
 
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Health Mornitoring System</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Register Page </title>
     <link rel='stylesheet' type='text/css' media='screen' href='../css/index.css'>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-        rel="stylesheet">
+    <link rel='stylesheet' type='text/css' media='screen' href='../css/login.css'>
 </head>
 
 <body>
+    <main class="wrapper">
+        <h2>Registration</h2>
+        <form action="#">
+            <div class="input-box">
+                <input type="text" placeholder="Enter your name" required>
+            </div>
+            <div class="input-box">
+                <input type="text" placeholder="Enter your email" required>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Create password" required>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Confirm password" required>
+            </div>
+            <div class="policy">
+                <h3>Are you a Doctor?</h3>
 
+                <div class="choose">
+                    <div>
+                        <label>Yes</label>
+                        <input name="isDoctor" value="Doctor" type="radio">
+                    </div>
+
+                    <div>
+                        <label>No</label>
+                        <input name="isDoctor" value="Patient" type="radio">
+                    </div>
+                </div>
+            </div>
+            <div class="input-box button">
+                <input type="Submit" value="Register Now">
+            </div>
+            <div class="text">
+                <h3>Already have an account? <a href="login.html">Login now</a></h3>
+            </div>
+        </form>
+    </main>
 </body>
 
 </html>
