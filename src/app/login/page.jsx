@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import styles from './login.module.css';
 
-function LoginPage() { 
+function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -28,19 +28,24 @@ function LoginPage() {
           <div className={styles.inputBox}>
             <input
               type="password"
-              placeholder="Enter your password" 
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
           <div className={`${styles.inputBox} ${styles.button}`}>
-            <input type="submit" value="Login" />
+            <button
+              type="submit"
+              className={styles.submitButton}
+            >
+              Login
+            </button>
           </div>
           <div className={styles.text}>
             <h3>
               Don't have an account?{' '}
-              <a href="/sign_up">Sign up now</a> 
+              <a href="/sign_up">Sign up now</a>
             </h3>
           </div>
         </form>

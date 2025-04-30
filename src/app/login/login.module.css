@@ -38,13 +38,13 @@
   margin-top: 30px;
 }
 
-.wrapper form .inputBox { 
-  height: 52px;
+.wrapper form .inputBox {
+  height: 100%;
   margin: 18px 0;
 }
 
 .inputBox input {
-  height: 100%;
+  height: 52px;
   width: 100%;
   outline: none;
   padding: 0 15px;
@@ -57,20 +57,28 @@
   transition: all 0.3s ease;
 }
 
-.inputBox input:focus,
-.inputBox input:valid {
+.inputBox input:focus {
   border-color: #4070f4;
 }
 
-.inputBox.button input {
+.submitButton {
+  height: 52px;
+  width: 100%;
+  outline: none;
+  padding: 0 15px;
+  font-size: 17px;
+  font-weight: 400;
+  transition: all 0.3s ease;
   color: #fff;
   letter-spacing: 1px;
   border: none;
+  border-bottom-width: 2.5px;
+  border-radius: 6px;
   background: #4070f4;
   cursor: pointer;
 }
 
-.inputBox.button input:hover {
+.inputBox.button button:hover {
   background: #0e4bf1;
 }
 
@@ -89,13 +97,21 @@
   text-decoration: underline;
 }
 
-.policy{
+.policy {
   display: flex;
   justify-content: space-between;
   color: black;
 }
 
-.choose{
+.choose {
   display: flex;
   gap: 10px;
+}
+
+.radioLabel span{
+  margin-left: 5px;
+}
+
+.inputBox label{
+  margin-bottom: 5px;
 }

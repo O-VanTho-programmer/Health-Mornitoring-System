@@ -1,6 +1,6 @@
 import React from 'react'
 
-function FillInformation() {
+function LinkInSideMenu() {
   return (
     <div>
         
@@ -8,4 +8,4 @@ function FillInformation() {
   )
 }
 
-export default FillInformation
+export default LinkInSideMenu
