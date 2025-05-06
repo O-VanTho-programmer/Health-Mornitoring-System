@@ -4,11 +4,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --bg-color: #4e73df;
 }
 
 *{
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
