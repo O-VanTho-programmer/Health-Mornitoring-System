@@ -4,7 +4,7 @@ import styles from '../login/login.module.css';
 import axios from 'axios';
 
 function RegistrationPage() {
-  const [isFillInformation, setIsFillInformation] = useState(true);
+  const [isFillInformation, setIsFillInformation] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -60,7 +60,7 @@ function RegistrationPage() {
     }
 
     try {
-      const res = await axios.post('http://localhost/sign_up', formData );
+      const res = await axios.post('http://localhost:5000/sign_up', formData );
 
       if (res.status === 200) {
         window.location.href = '/login';

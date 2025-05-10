@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className='flex min-h-[100vh] relative justify-end'>
-                <aside className={`${styles.sidebar} absolute max-w-[250px] h-screen bg-gradient-primary top-0 left-0 pt-[20px] px-[10px] text-white`}>
+                <aside className={`${styles.sidebar} fixed max-w-[250px] h-screen bg-gradient-primary top-0 left-0 pt-[20px] px-[10px] text-white`}>
                     <h2>Health Mornitoring System</h2>
 
                     <ul className={styles.side_nav}>

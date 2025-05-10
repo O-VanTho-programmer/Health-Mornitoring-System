@@ -6,12 +6,15 @@ import Table from '@/component/Table/Table';
 
 export default function Page() {
   const [user, setUser] = useState(null);
-
+  const labels = ["ID", "Name", "Admission Date"];
   return (
     <div>
       <div className="flex flex-col lg:flex-row gap-6 p-6 max-h-[360px]">
         {/* Table */}
-        <Table dataType={'Patient'}/>
+        <div>
+          <h1 className='title'>Your Patients</h1>
+          <Table labels={labels} />
+        </div>
 
         {/* Patient Info */}
         <div className="px-6 py-4 bg-white shadow-md rounded-md flex-1">
@@ -23,7 +26,7 @@ export default function Page() {
       </div>
 
       <div className={styles.patient_health_status}>
-        
+
       </div>
     </div>
   );
