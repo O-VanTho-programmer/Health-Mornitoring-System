@@ -9,12 +9,14 @@ function RegistrationPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    userType: 'Doctor',
+    gender: '',
+    userType: 'Patient',
     height: 0,
     weight: 0,
     DOB: '',
-    maxPatient: 0
+    maxPatient: '',
+    expertise: '',
+    YoE: '',
   });
 
   const handleChange = (e) => {
@@ -54,13 +56,13 @@ function RegistrationPage() {
       return;
     }
 
-    if (formData.userType === 'Doctor' && formData.maxPatient === 0) {
+    if (formData.userType === 'Doctor' && (!formData.maxPatient || !formData.expertise || !formData.YoE)) {
       alert("Please fill all professional information properly");
       return;
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/sign_up', formData );
+      const res = await axios.post('http://localhost:5000/sign_up', formData);
 
       if (res.status === 200) {
         window.location.href = '/login';
@@ -222,18 +224,48 @@ function RegistrationPage() {
 
               {/* For Doctor */}
               {formData.userType === 'Doctor' && (
-                <div className={styles.inputBox}>
-                  <label htmlFor='maxPatient' >Maximum number of patients you can handle simultaneously</label>
-                  <input
-                    id='maxPatient'
-                    type="number"
-                    name="maxPatient"
-                    value={formData.maxPatient}
-                    onChange={handleChange}
-                    required
-                    className={styles.input}
-                  />
-                </div>
+                <>
+                  <div className={styles.inputBox}>
+                    <label htmlFor='maxPatient' >Maximum number of patients you can handle simultaneously</label>
+                    <input
+                      id='maxPatient'
+                      type="number"
+                      name="maxPatient"
+                      value={formData.maxPatient}
+                      onChange={handleChange}
+                      required
+                      className={styles.input}
+                    />
+                  </div>
+
+
+                  <div className={styles.inputBox}>
+                    <label htmlFor='expertise'>Expertise</label>
+                    <input
+                      id='expertise'
+                      type="number"
+                      name="expertise"
+                      value={formData.expertise}
+                      onChange={handleChange}
+                      required
+                      className={styles.input}
+                    />
+                  </div>
+
+                  <div className={styles.inputBox}>
+                    <label htmlFor='YoE'>Year of experience</label>
+                    <input
+                      id='YoE'
+                      type="number"
+                      name="YoE"
+                      value={formData.YoE}
+                      onChange={handleChange}
+                      required
+                      className={styles.input}
+                    />
+                  </div>
+                </>
+
               )}
               {/* For Doctor */}
 
