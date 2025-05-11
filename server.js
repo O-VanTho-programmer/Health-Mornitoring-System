@@ -61,6 +61,7 @@ app.post('/sign_up', async (req, res) => {
   }
 })
 
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -87,7 +88,7 @@ app.post('/login', async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', 
+      secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
