@@ -9,8 +9,9 @@ function RegistrationPage() {
     name: '',
     email: '',
     password: '',
+    confirmPassword:'',
     gender: '',
-    userType: 'Patient',
+    userType: "patient",
     height: 0,
     weight: 0,
     DOB: '',
@@ -27,8 +28,7 @@ function RegistrationPage() {
     }));
   };
 
-  const nextStep = (e) => {
-    e.preventDefault();
+  const nextStep = () => {
 
     if (formData.name === '' || formData.email === '' || formData.password === '' || formData.confirmPassword === '') {
       alert("Please fill all information!");
@@ -43,20 +43,19 @@ function RegistrationPage() {
     setIsFillInformation(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
 
     if (formData.gender === '' || formData.DOB === '') {
       alert("Please fill all information properly");
       return;
     }
 
-    if (formData.userType === 'Patient' && (formData.height === 0 || formData.weight === 0)) {
+    if (formData.userType === 'patient' && (formData.height === 0 || formData.weight === 0)) {
       alert("Please fill all information properly");
       return;
     }
 
-    if (formData.userType === 'Doctor' && (!formData.maxPatient || !formData.expertise || !formData.YoE)) {
+    if (formData.userType === 'doctor' && (!formData.maxPatient || !formData.expertise || !formData.YoE)) {
       alert("Please fill all professional information properly");
       return;
     }
@@ -64,7 +63,7 @@ function RegistrationPage() {
     try {
       const res = await axios.post('http://localhost:5000/sign_up', formData);
 
-      if (res.status === 200) {
+      if (res.status === 201) {
         window.location.href = '/login';
       }
     } catch (error) {
@@ -132,8 +131,8 @@ function RegistrationPage() {
                       <input
                         type="radio"
                         name="userType"
-                        value="Doctor"
-                        checked={formData.userType === 'Doctor'}
+                        value="doctor"
+                        checked={formData.userType === "doctor"}
                         onChange={handleChange}
                         className={styles.radioInput}
                       />
@@ -145,8 +144,8 @@ function RegistrationPage() {
                       <input
                         type="radio"
                         name="userType"
-                        value="Patient"
-                        checked={formData.userType === 'Patient'}
+                        value="patient"
+                        checked={formData.userType === "patient"}
                         onChange={handleChange}
                         className={styles.radioInput}
                       />
@@ -191,7 +190,7 @@ function RegistrationPage() {
               </div>
 
               {/* Fỏr patient */}
-              {formData.userType === 'Patient' && (
+              {formData.userType === 'patient' && (
                 <>
                   <div className={styles.inputBox}>
                     <label htmlFor='height' >Enter your Height (cm)</label>
@@ -223,7 +222,7 @@ function RegistrationPage() {
               {/* For Patient */}
 
               {/* For Doctor */}
-              {formData.userType === 'Doctor' && (
+              {formData.userType === 'doctor' && (
                 <>
                   <div className={styles.inputBox}>
                     <label htmlFor='maxPatient' >Maximum number of patients you can handle simultaneously</label>
@@ -243,7 +242,7 @@ function RegistrationPage() {
                     <label htmlFor='expertise'>Expertise</label>
                     <input
                       id='expertise'
-                      type="number"
+                      type="text"
                       name="expertise"
                       value={formData.expertise}
                       onChange={handleChange}

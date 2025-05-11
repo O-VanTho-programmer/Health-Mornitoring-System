@@ -1,6 +1,4 @@
 'use client';
-
-import React from 'react';
 import { FaThermometerHalf, FaHeartbeat, FaSyringe } from 'react-icons/fa';
 
 const getHealthStatusColor = (metric, value) => {
@@ -34,7 +32,7 @@ function HealthStatus() {
 
     return (
         <div className="mt-6">
-            <h1 className="text-xl font-semibold mb-4 border-b pb-2 border-gray-200">
+            <h1 className="title border-b pb-2 border-gray-200">
                 Health Status
             </h1>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

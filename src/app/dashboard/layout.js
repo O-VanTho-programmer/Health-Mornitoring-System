@@ -19,8 +19,8 @@ export default function RootLayout({ children }) {
                     <h2>Health Mornitoring System</h2>
 
                     <ul className={styles.side_nav}>
-                        <li><a href='/dashboard/health_status/doctor'><RiHealthBookFill size={28}/> Health Status</a></li>
-                        <li><a href=''><FaUserDoctor size={28} /> Doctor</a></li>
+                        <li><a href={`/dashboard/health_status/doctor`}><RiHealthBookFill size={28}/> Health Status</a></li>
+                        <li><a href={``}><FaUserDoctor size={28} /> Doctor</a></li>
                         <li><a href='/dashboard/consultant'><BiSolidConversation size={28} /> Consultant</a></li>
                         <li><a href=''><IoExit size={28} /> Logout </a></li>
                     </ul>

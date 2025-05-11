@@ -15,11 +15,12 @@ app.post('/sign_up', async (req, res) => {
     name,
     email,
     password,
-    userType,
+    confirmPassword,
     gender,
-    DOB,
+    userType,
     height,
     weight,
+    DOB,
     maxPatient,
     expertise,
     YoE
@@ -28,6 +29,10 @@ app.post('/sign_up', async (req, res) => {
   try {
     // Mã hóa mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    if (!['patient', 'doctor'].includes(userType.trim().toLowerCase())) {
+      return res.status(400).json({ message: 'Invalid role' });
+    }
 
     // Chèn vào bảng users
     const [userResult] = await db.query(
@@ -38,7 +43,7 @@ app.post('/sign_up', async (req, res) => {
 
     const userId = userResult.insertId;
     /*patient*/
-    if (userType === 'Patient') {
+    if (userType === "patient") {
       await db.query(
         `INSERT INTO patients (patient_id, height, weight)
          VALUES (?, ?, ?)`,
@@ -46,15 +51,15 @@ app.post('/sign_up', async (req, res) => {
       );
     }
     /*doctor*/
-    else if (userType === 'Doctor') {
+    else if (userType === "doctor") {
 
-      await db.execute(
+      await db.query(
         `INSERT INTO doctors (doctor_id, max_patient, isAvailable, YoE, expertise)
          VALUES (?, ?, ?, ?, ?)`,
         [userId, maxPatient, true, YoE, expertise]
       );
     }
-
+    console.log("Run")
     return res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     return res.status(500).json({ message: "Error when sign up", error });
@@ -88,9 +93,9 @@ app.post('/login', async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', 
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 
+      maxAge: 24 * 60 * 60 * 1000
     });
 
     return res.status(200).json({
