@@ -44,11 +44,19 @@ app.post('/sign_up', async (req, res) => {
     const userId = userResult.insertId;
     /*patient*/
     if (userType === "patient") {
-      await db.query(
-        `INSERT INTO patients (patient_id, height, weight)
-         VALUES (?, ?, ?)`,
-        [userId, height, weight]
+      const [patientResult] = await db.query(
+        `INSERT INTO patients (patient_id)
+         VALUES (?)`,
+        [userId]
       );
+
+      const patientID = patientResult.insertId;
+
+      await db.query(
+        `INSERT INTO health_status(patient_id, height, weight)
+         VALUES (?, ?, ?)`,
+         [patientID, height, weight]
+      )
     }
     /*doctor*/
     else if (userType === "doctor") {
