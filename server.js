@@ -88,6 +88,7 @@ app.post('/login', async (req, res) => {
 
     const user = userResult[0];
 
+    console.log(user)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log("Password is incorrect")
@@ -95,27 +96,27 @@ app.post('/login', async (req, res) => {
     }
 
 
-    // const token = jwt.sign(
-    //   { id: user[0].id, email: user[0].email, role: user[0].role },
-    //   "dasdnoo-aCVXd_vcS-jgasdvs",
-    //   { expiresIn: '1d' }
-    // );
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      "dasdnoo-aCVXd_vcS-jgasdvs",
+      { expiresIn: '1d' }
+    );
 
-    // res.cookie('token', token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'strict',
-    //   maxAge: 24 * 60 * 60 * 1000
-    // });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000
+    });
 
     return res.status(200).json({
       message: "Login successful",
-      // token,
+      token,
       user: {
-        id: user[0].id,
-        name: user[0].name,
-        email: user[0].email,
-        role: user[0].role,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       }
     });
 
