@@ -1,14 +1,23 @@
 'use client';
 import React, { useState } from 'react';
 import styles from './login.module.css';
+import axios from 'axios';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password });
+    try {
+      const res = await axios.post(`http://localhost:5000/login`, {email, password})
+
+      if(res.status === 200){
+        window.location.href = '/dashboard'
+      }
+    } catch (error) {
+      console.log("Error Login", error);
+    }
   };
 
   return (

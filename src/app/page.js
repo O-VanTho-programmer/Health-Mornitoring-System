@@ -1,3 +1,4 @@
+'use client';
 import useAuthRedirect from '@/hooks/useAuthRedirect'
 import React from 'react'
 

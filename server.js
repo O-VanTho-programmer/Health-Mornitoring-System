@@ -67,13 +67,12 @@ app.post('/sign_up', async (req, res) => {
         [userId, maxPatient, true, YoE, expertise]
       );
     }
-    console.log("Run")
+
     return res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     return res.status(500).json({ message: "Error when sign up", error });
   }
 })
-
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -83,32 +82,35 @@ app.post('/login', async (req, res) => {
     const [userResult] = await db.query(queryUser, [email]);
 
     if (userResult.length === 0) {
+      console.log("Email doesn't exist")
       return res.status(401).json({ message: "Email doesn't exist" });
     }
 
     const user = userResult[0];
 
-    const isMatch = await bcrypt.compare(password, user[0].password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log("Password is incorrect")
       return res.status(401).json({ message: "Password is incorrect" });
     }
 
-    const token = jwt.sign(
-      { id: user[0].id, email: user[0].email, role: user[0].role },
-      "dasdnoo-aCVXd_vcS-jgasdvs",
-      { expiresIn: '1d' }
-    );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    // const token = jwt.sign(
+    //   { id: user[0].id, email: user[0].email, role: user[0].role },
+    //   "dasdnoo-aCVXd_vcS-jgasdvs",
+    //   { expiresIn: '1d' }
+    // );
+
+    // res.cookie('token', token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'strict',
+    //   maxAge: 24 * 60 * 60 * 1000
+    // });
 
     return res.status(200).json({
       message: "Login successful",
-      token,
+      // token,
       user: {
         id: user[0].id,
         name: user[0].name,
