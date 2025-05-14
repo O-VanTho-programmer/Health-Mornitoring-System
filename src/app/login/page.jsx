@@ -10,9 +10,9 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`http://localhost:5000/login`, {email, password})
+      const res = await axios.post(`http://localhost:5000/login`, { email, password }, { withCredentials: true })
 
-      if(res.status === 200){
+      if (res.status === 200) {
         window.location.href = '/dashboard'
       }
     } catch (error) {

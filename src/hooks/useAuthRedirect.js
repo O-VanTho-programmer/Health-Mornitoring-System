@@ -6,7 +6,9 @@ const useAuthRedirect = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get('/me', { withCredentials: true });
+        const res = await axios.get('/me', { withCredentials: true });
+
+        console.log(res.data);
       } catch (error) {
         window.location.href='/login'
       }

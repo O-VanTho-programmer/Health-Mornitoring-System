@@ -3,12 +3,15 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const cookieParser = require('cookie-parser');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true
+}));
 app.use(express.json());
-
+app.use(cookieParser());
 
 app.post('/sign_up', async (req, res) => {
   const {
@@ -55,7 +58,7 @@ app.post('/sign_up', async (req, res) => {
       await db.query(
         `INSERT INTO health_status(patient_id, height, weight)
          VALUES (?, ?, ?)`,
-         [patientID, height, weight]
+        [patientID, height, weight]
       )
     }
     /*doctor*/
@@ -88,7 +91,6 @@ app.post('/login', async (req, res) => {
 
     const user = userResult[0];
 
-    console.log(user)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log("Password is incorrect")
@@ -97,17 +99,19 @@ app.post('/login', async (req, res) => {
 
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, name:user.name, email: user.email, role: user.role, avatar: user.avatar},
       "dasdnoo-aCVXd_vcS-jgasdvs",
       { expiresIn: '1d' }
     );
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000
     });
+
+    console.log(user)
 
     return res.status(200).json({
       message: "Login successful",
@@ -117,6 +121,7 @@ app.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar
       }
     });
 
@@ -125,9 +130,18 @@ app.post('/login', async (req, res) => {
   }
 })
 
+app.post('/logout', async (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false, 
+    sameSite: 'strict',
+  });
+  return res.status(200).json({ message: 'Logged out successfully' });
+})
+
 app.get('/me', (req, res) => {
   const token = req.cookies.token;
-
+  console.log("Cookies received:", req.cookies);
   if (!token) {
     return res.status(401).json({ message: 'Not authenticated' });
   }
