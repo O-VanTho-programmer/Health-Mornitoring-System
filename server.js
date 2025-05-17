@@ -154,6 +154,15 @@ app.get('/me', (req, res) => {
   }
 });
 
+// 
+app.get('/get_doctors', async (req, res) => {
+  try {
+    const query = 'SELECT * FROM doctors'
+  } catch (error) {
+    console.log("Error fetching doctor data", error)
+    return res.status(500);
+  }
+})
 
 
 

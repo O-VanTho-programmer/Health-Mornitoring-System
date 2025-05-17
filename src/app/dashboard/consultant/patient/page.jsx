@@ -1,9 +1,26 @@
 'use client';
 import Avatar from '@/component/Avatar/Avatar';
 import Table from '@/component/Table/Table';
-import React from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 
 function page() {
+
+    const [doctors, setDoctors] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+
+    useEffect(() => {
+        const getDoctorsData = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/get_doctors');
+                
+            } catch (error) {
+                console.log("Error while getting doctor datas" , error)
+            }
+        }
+    }, [])
+
     const labels = ["Date", "Doctor", "Subject", "Status"];
     return (
         <div>
