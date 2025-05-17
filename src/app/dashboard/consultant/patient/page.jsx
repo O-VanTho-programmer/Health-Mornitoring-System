@@ -2,24 +2,46 @@
 import Avatar from '@/component/Avatar/Avatar';
 import Table from '@/component/Table/Table';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { UserContext } from '../../layout';
 
 function page() {
-
+    const currentUser = useContext(UserContext);
     const [doctors, setDoctors] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-
+    const [madeConsultants, setMadeConsultants] = useState([]);
 
     useEffect(() => {
+        const getMadeConsultants = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/get_made_consultants/${currentUser.id}`);
+                setMadeConsultants(res.data.consultants);
+            } catch (error) {
+                console.log("Error getting consultants");
+            }
+        }
+
         const getDoctorsData = async () => {
             try {
                 const res = await axios.get('http://localhost:5000/get_doctors');
-                
+                setDoctors(res.data.doctors);
             } catch (error) {
-                console.log("Error while getting doctor datas" , error)
+                console.log("Error while getting doctor datas", error)
             }
         }
+
+        getMadeConsultants();
+        getDoctorsData();
     }, [])
+
+    const handleSubmit = async () => {
+        try {
+            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor})
+            
+        } catch (error) {
+            
+        }
+    }
 
     const labels = ["Date", "Doctor", "Subject", "Status"];
     return (
@@ -39,26 +61,41 @@ function page() {
                             <div className='flex flex-col gap-2 '>
                                 <div className='text-xl font-bold'>
                                     <label className='text-gray-700' htmlFor='id' >Dr.</label>
-                                    <select className='border-b-2 border-blue-600 px-1' id='id'>
-                                        <option value={1}>Benzul</option>
-                                        <option value={2}>Ben10</option>
-                                        <option value={3}>Mawteniue</option>
+                                    <select onChange={(e) => setSelectedDoctor(Number(e.target.value))} className='border-b-2 border-blue-600 px-1' id='id'>
+                                        <option value={''} hidden className=''>Select your doctor</option>
+                                        {doctors.map((d) => (
+                                            <option key={d.doctor_id} value={d.doctor_id}>{d.name}</option>
+                                        ))}
                                     </select>
                                 </div>
 
                                 <div>
                                     <label className='label' htmlFor='gender' >Gender: </label>
-                                    <span className='span' id='gender'>Male</span>
+                                    <span className='span' id='gender'>
+                                        {selectedDoctor !== null ?
+                                            (doctors.find(d => d.doctor_id == selectedDoctor)?.gender || 'Unknow')
+                                            : ("Unknown")}
+                                    </span>
                                 </div>
 
                                 <div>
                                     <label className='label' htmlFor='exp' >Expertise: </label>
-                                    <span className='span' id='exp'>Expertise</span>
+                                    <span className='span' id='exp'>
+                                        {selectedDoctor !== null ?
+                                            (doctors.find(d => d.doctor_id === selectedDoctor)?.expertise || 'Unknown')
+                                            : ("Unknown")}
+                                    </span>
                                 </div>
 
                                 <div>
                                     <label className='label' htmlFor='YoE' >Year of experience: </label>
-                                    <span className='span' id='YoE'>5</span>
+                                    <span className='span' id='YoE'>
+                                        <span className='span' id='exp'>
+                                            {selectedDoctor !== null ?
+                                                (doctors.find(d => d.doctor_id === selectedDoctor)?.YoE || 'Unknown')
+                                                : ("Unknown")}
+                                        </span>
+                                    </span>
                                 </div>
                             </div>
 

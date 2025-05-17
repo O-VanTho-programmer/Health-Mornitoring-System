@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:3000', 
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
@@ -99,7 +99,7 @@ app.post('/login', async (req, res) => {
 
 
     const token = jwt.sign(
-      { id: user.id, name:user.name, email: user.email, role: user.role, avatar: user.avatar},
+      { id: user.user_id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
       "dasdnoo-aCVXd_vcS-jgasdvs",
       { expiresIn: '1d' }
     );
@@ -111,13 +111,11 @@ app.post('/login', async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    console.log(user)
-
     return res.status(200).json({
       message: "Login successful",
       token,
       user: {
-        id: user.id,
+        id: user.user_id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -133,7 +131,7 @@ app.post('/login', async (req, res) => {
 app.post('/logout', async (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    secure: false, 
+    secure: false,
     sameSite: 'strict',
   });
   return res.status(200).json({ message: 'Logged out successfully' });
@@ -141,7 +139,6 @@ app.post('/logout', async (req, res) => {
 
 app.get('/me', (req, res) => {
   const token = req.cookies.token;
-  console.log("Cookies received:", req.cookies);
   if (!token) {
     return res.status(401).json({ message: 'Not authenticated' });
   }
@@ -157,12 +154,37 @@ app.get('/me', (req, res) => {
 // 
 app.get('/get_doctors', async (req, res) => {
   try {
-    const query = 'SELECT * FROM doctors'
+    const query = `
+      SELECT doctor_id, isAvailable, max_patient, expertise, YoE, u.name, u.role, u.avatar, u.gender, u.dob FROM doctors
+      JOIN users u ON u.user_id = doctor_id    
+    `;
+
+    const [doctors] = await db.query(query);
+    return res.status(200).json({ message: "Get success", doctors });
   } catch (error) {
     console.log("Error fetching doctor data", error)
-    return res.status(500);
+    return res.status(500).json({message: "Error fetching doctor data"});
   }
 })
+
+app.get('/get_made_consultants/:patient_id', async (req, res) => {
+  const patient_id = req.params;
+  try {
+    const query = `
+      SELECT * FROM consultant_request
+      WHERE patient_id = ? AND status = 'Complete'
+    `;
+
+    const [consultants] = await db.query(query, [patient_id]);
+
+    return res.status(200).json({message: "Get consultants success", consultants});
+  } catch (error) {
+    console.log("Error fetching made consultants", error)
+    return res.status(500).json({message: "Error fetching made consultants"});
+  }
+})
+
+
 
 
 

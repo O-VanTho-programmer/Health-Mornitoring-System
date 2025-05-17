@@ -2,7 +2,7 @@
 import React from 'react'
 import styles from './table.module.css';
 
-function Table({labels}) {
+function Table({labels, data}) {
     return (
         <div className={styles.tableWrapper}>
             <table className={styles.table}>
