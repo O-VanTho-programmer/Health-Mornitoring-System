@@ -11,6 +11,10 @@ function page() {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [madeConsultants, setMadeConsultants] = useState([]);
 
+    const [subject, setSubject] = useState("");
+    const [message, setMessage] = useState("");
+    const [selectedDate, setSelectedDate] = useState(null);
+
     useEffect(() => {
         const getMadeConsultants = async () => {
             try {
@@ -36,7 +40,7 @@ function page() {
 
     const handleSubmit = async () => {
         try {
-            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor})
+            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor, selectedDate})
             
         } catch (error) {
             
@@ -110,18 +114,18 @@ function page() {
                         <div className="w-full md:w-1/2 space-y-4">
                             <div className="flex flex-col">
                                 <label className="label mb-1" htmlFor="date">Date:</label>
-                                <input type="date" id="date" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                <input value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} type="date" id="date" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
 
                             <div className="flex flex-col">
                                 <label className="label mb-1" htmlFor="subject">Subject:</label>
-                                <input type="text" id="subject" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                <input value={subject} onChange={(e) => setSubject(e.target.value)} type="text" id="subject" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
                         </div>
 
                         {/* Right Section */}
                         <div className="w-full md:w-1/2 flex flex-col gap-4">
-                            <textarea className="w-full min-h-[120px] p-3 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message"></textarea>
+                            <textarea value={message} onChange={(e) => setMessage(e.target.value)} className="w-full min-h-[120px] p-3 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message"></textarea>
                             <button type="submit" className="send_btn self-start">Send</button>
                         </div>
                     </form>

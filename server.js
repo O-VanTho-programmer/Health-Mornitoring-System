@@ -184,7 +184,17 @@ app.get('/get_made_consultants/:patient_id', async (req, res) => {
   }
 })
 
+app.post('/submit_consultant', async (req, res) => {
+  const {patient_id, doctor_id, selectedDate} = req.body;
 
+  try {
+    const query = `
+      INSERT INTO consultant_request (doctor_id, patient_id)
+    `;
+  } catch (error) {
+    
+  }
+})
 
 
 
