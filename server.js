@@ -35,10 +35,19 @@ app.post('/sign_up', async (req, res) => {
     } 
     /*doctor*/
     else if (userType === 'DOCTOR') {
+<<<<<<< Updated upstream
       await db.execute(
         `INSERT INTO doctors (doctor_id, max_patient, isAvailable)
          VALUES (?, ?, ?)`,
         [userId, maxPatient, true]
+=======
+      const { maxPatient, YoE, expertise } = req.body;
+    
+      await db.execute(
+        `INSERT INTO doctors (doctor_id, max_patient, isAvailable, YoE, expertise)
+         VALUES (?, ?, ?, ?, ?)`,
+        [userId, maxPatient, true, YoE, expertise]
+>>>>>>> Stashed changes
       );
     }
 
@@ -50,11 +59,53 @@ app.post('/sign_up', async (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
 
 
 
 
 
+=======
+//get_all_patients
+app.get('/get_all_patients', async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT patient_id AS id, full_name AS name, dob, 
+             TIMESTAMPDIFF(YEAR, dob, CURDATE()) AS age, gender 
+      FROM patients
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching patients:', err);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+});
+
+
+//get_health_status_by_patient_id?id=P123
+app.get('/get_health_status_by_patient_id', async (req, res) => {
+  const { id } = req.query;
+
+  if (!id) return res.status(400).json({ error: 'Missing patient_id' });
+
+  try {
+    const [rows] = await db.execute(`
+      SELECT * FROM health_status 
+      WHERE patient_id = ?
+      ORDER BY recorded_at DESC
+    `, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No health records found for this patient' });
+    }
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching health status:', err);
+    res.status(500).json({ error: 'Failed to fetch health status' });
+  }
+});
+>>>>>>> Stashed changes
 
 
 
