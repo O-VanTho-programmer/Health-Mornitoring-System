@@ -52,7 +52,7 @@ app.post('/sign_up', async (req, res) => {
          VALUES (?)`,
         [userId]
       );
-
+      
       const patientID = patientResult.insertId;
 
       await db.query(
@@ -96,7 +96,6 @@ app.post('/login', async (req, res) => {
       console.log("Password is incorrect")
       return res.status(401).json({ message: "Password is incorrect" });
     }
-
 
     const token = jwt.sign(
       { id: user.user_id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
@@ -167,6 +166,22 @@ app.get('/get_doctors', async (req, res) => {
   }
 })
 
+
+//get_all_patients
+app.get('/get_all_patients', async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT patient_id AS id, full_name AS name, dob, 
+             TIMESTAMPDIFF(YEAR, dob, CURDATE()) AS age, gender 
+      FROM patients
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching patients:', err);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+});
+
 app.get('/get_made_consultants/:patient_id', async (req, res) => {
   const patient_id = req.params;
   try {
@@ -174,7 +189,7 @@ app.get('/get_made_consultants/:patient_id', async (req, res) => {
       SELECT * FROM consultant_request
       WHERE patient_id = ? AND status = 'Complete'
     `;
-
+    
     const [consultants] = await db.query(query, [patient_id]);
 
     return res.status(200).json({message: "Get consultants success", consultants});
@@ -196,13 +211,29 @@ app.post('/submit_consultant', async (req, res) => {
   }
 })
 
+//get_health_status_by_patient_id?id=P123
+app.get('/get_health_status_by_patient_id', async (req, res) => {
+  const { id } = req.query;
 
+  if (!id) return res.status(400).json({ error: 'Missing patient_id' });
 
+  try {
+    const [rows] = await db.execute(`
+      SELECT * FROM health_status 
+      WHERE patient_id = ?
+      ORDER BY recorded_at DESC
+    `, [id]);
 
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No health records found for this patient' });
+    }
 
-
-
-
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching health status:', err);
+    res.status(500).json({ error: 'Failed to fetch health status' });
+  }
+});
 
 const db = mysql.createConnection({
   host: 'localhost',
