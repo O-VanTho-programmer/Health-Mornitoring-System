@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import styles from './dashboard.module.css';
 import Avatar from '@/component/Avatar/Avatar';
 import { FaAngleDown } from "react-icons/fa";
@@ -7,22 +7,50 @@ import { IoExit } from "react-icons/io5";
 import { RiHealthBookFill } from "react-icons/ri";
 import { FaUserDoctor } from "react-icons/fa6";
 import { BiSolidConversation } from "react-icons/bi";
+import logout from '@/utils/logout';
+import axios from 'axios';
+
+export const UserContext = createContext(null);
 
 export default function RootLayout({ children }) {
 
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/me', {
+                    withCredentials: true
+                });
+
+                setUser(res.data.user);
+            } catch (err) {
+                console.error(err);
+                window.location.href = '/login';
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkAuth();
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
 
     return (
-        <html lang="en">
-            <body className='flex min-h-[100vh] relative justify-end'>
-                <aside className={`${styles.sidebar} absolute max-w-[250px] h-screen bg-gradient-primary top-0 left-0 pt-[20px] px-[10px] text-white`}>
+        <UserContext.Provider value={user}>
+            <div className='flex min-h-[100vh] relative justify-end'>
+                <aside className={`${styles.sidebar} fixed max-w-[250px] h-screen bg-gradient-primary top-0 left-0 pt-[20px] px-[10px] text-white`}>
                     <h2>Health Mornitoring System</h2>
 
                     <ul className={styles.side_nav}>
-                        <li><a href='/dashboard/health_status/doctor'><RiHealthBookFill size={28}/> Health Status</a></li>
-                        <li><a href=''><FaUserDoctor size={28} /> Doctor</a></li>
-                        <li><a href='/dashboard/consultant'><BiSolidConversation size={28} /> Consultant</a></li>
-                        <li><a href=''><IoExit size={28} /> Logout </a></li>
+                        <li><a href={`/dashboard/health_status/${user.role === 'patient' ? 'patient' : 'doctor'}`}><RiHealthBookFill size={28} /> Health Status</a></li>
+                        {user.role === 'patient' && (
+                            <li><a href={`/dashboard/doctors`}><FaUserDoctor size={28} />My Doctor</a></li>
+                        )}
+                        <li><a href={`/dashboard/consultant/${user.role === 'patient' ? 'patient' : 'doctor'}`}><BiSolidConversation size={28} /> Consultant</a></li>
+                        <li> <a href='' onClick={logout}><IoExit size={28} /> Logout</a> </li>
                     </ul>
 
                 </aside>
@@ -42,7 +70,7 @@ export default function RootLayout({ children }) {
                             <ul className='hidden absolute group-hover:block top-full right-0 bg-white shadow'>
                                 <li><a>Profile</a></li>
                                 <li><a href='/dashboard/doctor/health_status'>Health Status</a></li>
-                                <li><a>Logout <IoExit /></a></li>
+                                <li><a onClick={logout}>Logout <IoExit /></a></li>
                             </ul>
                         </div>
                     </section>
@@ -51,7 +79,7 @@ export default function RootLayout({ children }) {
                         {children}
                     </section>
                 </main>
-            </body>
-        </html>
+            </div>
+        </UserContext.Provider>
     );
 }

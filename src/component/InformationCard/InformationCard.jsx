@@ -14,7 +14,7 @@ function InformationCard({ dataType }) {
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-6">
-      <div className="w-[140px] h-[140px] border rounded-md overflow-hidden">
+      <div className="w-[140px] h-[140px] border-3 border-blue-400 rounded-md overflow-hidden">
         <Avatar img_url={'/images/default_avatar.jpg'} />
       </div>
 
