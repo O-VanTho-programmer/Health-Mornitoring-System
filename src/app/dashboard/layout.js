@@ -47,7 +47,7 @@ export default function RootLayout({ children }) {
                     <ul className={styles.side_nav}>
                         <li><a href={`/dashboard/health_status/${user.role === 'patient' ? 'patient' : 'doctor'}`}><RiHealthBookFill size={28} /> Health Status</a></li>
                         {user.role === 'patient' && (
-                            <li><a href={`/dashboard/doctors`}><FaUserDoctor size={28} />My Doctor</a></li>
+                            <li><a href={`/dashboard/my_doctor`}><FaUserDoctor size={28} />My Doctor</a></li>
                         )}
                         <li><a href={`/dashboard/consultant/${user.role === 'patient' ? 'patient' : 'doctor'}`}><BiSolidConversation size={28} /> Consultant</a></li>
                         <li> <a href='' onClick={logout}><IoExit size={28} /> Logout</a> </li>
