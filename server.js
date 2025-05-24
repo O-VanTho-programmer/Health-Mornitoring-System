@@ -331,6 +331,68 @@ app.get('/get_health_status_by_patient_id/:patient_id', async (req, res) => {
   }
 });
 
+//get_made_consultants_patient_side
+app.get('/get_made_consultants_patient_side/:patient_id', async (req, res) => {
+  const { patient_id } = req.params;
+  try {
+    const query = `
+      SELECT 
+        cr.date, 
+        u.name AS doctor_name, 
+        cr.subject, 
+        cr.status
+      FROM consultant_request cr
+      JOIN doctors d ON cr.doctor_id = d.doctor_id
+      JOIN users u ON d.doctor_id = u.user_id
+      WHERE cr.patient_id = ?
+      ORDER BY cr.date DESC
+    `;
+
+    const [consultants] = await db.query(query, [patient_id]);
+
+    return res.status(200).json({
+      message: "Fetched consultant requests successfully",
+      consultants
+    });
+  } catch (error) {
+    console.error("Error fetching consultant requests", error);
+    return res.status(500).json({ message: "Server error while fetching consultant requests" });
+  }
+});
+
+
+//get_patients_by_doctor_id/:doctor_id
+app.get('/get_patients_by_doctor_id/:doctor_id', async (req, res) => {
+  const { doctor_id } = req.params;
+
+  try {
+    const query = `
+      SELECT DISTINCT 
+        u.user_id AS patient_id,
+        u.name AS full_name,
+        u.email,
+        u.gender,
+        u.avatar
+      FROM consultant_request cr
+      JOIN patients p ON cr.patient_id = p.patient_id
+      JOIN users u ON p.patient_id = u.user_id
+      WHERE cr.doctor_id = ?
+    `;
+
+    const [patients] = await db.query(query, [doctor_id]);
+
+    return res.status(200).json({
+      message: "Fetched patients successfully",
+      patients
+    });
+  } catch (error) {
+    console.error("Error fetching patients by doctor_id", error);
+    return res.status(500).json({ message: "Server error while fetching patients" });
+  }
+});
+
+
+
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
