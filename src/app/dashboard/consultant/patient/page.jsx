@@ -39,9 +39,20 @@ function page() {
         getDoctorsData();
     }, [])
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedDoctor || !selectedDate || !subject || !message) {
+            console.log("All fields are required");
+            return;
+        }
+
+        if (new Date(selectedDate) < new Date()) {
+            console.log("Date should be in the future");
+            return;
+        }
+
         try {
-            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor, selectedDate, message})
+            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor, selectedDate, message, subject})
             
         } catch (error) {
             console.log("Error while submitting consultant", error)

@@ -292,15 +292,15 @@ app.get('/get_made_consultants_patient_doctor/:patient_id/:doctor_id', async (re
 })
 
 app.post('/submit_consultant', async (req, res) => {
-  const { patient_id, doctor_id, selectedDate, message } = req.body;
+  const { patient_id, doctor_id, selectedDate, message, subject } = req.body;
 
   try {
     const query = `
-      INSERT INTO consultant_request (doctor_id, patient_id, date, message) VALUES (?, ?, ?, ?)
+      INSERT INTO consultant_request (doctor_id, patient_id, date, message, subject) VALUES (?, ?, ?, ?, ?)
     `;
 
-    await db.query(query, [doctor_id, patient_id, selectedDate, message]);
-
+    await db.query(query, [doctor_id, patient_id, selectedDate, message, subject]);
+    
     return res.status(200).json({ message: "Submit consultant success" });
   } catch (error) {
     console.log("Error while submitting consultant", error)
