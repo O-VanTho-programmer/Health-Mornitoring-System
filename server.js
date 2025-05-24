@@ -113,11 +113,12 @@ app.get('/get_made_consultants_patient_side/:patient_id', async (req, res) => {
     const query = `
       SELECT 
         cr.date, 
-        d.full_name AS doctor_name, 
+        u.name AS doctor_name, 
         cr.subject, 
         cr.status
       FROM consultant_request cr
-      JOIN doctors d ON cr.doctor_id = d.id
+      JOIN doctors d ON cr.doctor_id = d.doctor_id
+      JOIN users u ON d.doctor_id = u.user_id
       WHERE cr.patient_id = ?
       ORDER BY cr.date DESC
     `;
@@ -133,6 +134,7 @@ app.get('/get_made_consultants_patient_side/:patient_id', async (req, res) => {
     return res.status(500).json({ message: "Server error while fetching consultant requests" });
   }
 });
+
 
 //get_patients_by_doctor_id/:doctor_id
 app.get('/get_patients_by_doctor_id/:doctor_id', async (req, res) => {
