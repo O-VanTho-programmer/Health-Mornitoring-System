@@ -1,8 +1,13 @@
+'use client';
+import HealthStatus from '@/component/HealthStatus/HealthStatus'
 import React from 'react'
 
 function page() {
   return (
-    <div>page</div>
+    <div>
+      <HealthStatus />
+
+    </div>
   )
 }
 

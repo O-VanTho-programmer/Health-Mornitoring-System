@@ -1,12 +1,34 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '../health_status.module.css';
 import InformationCard from '@/component/InformationCard/InformationCard';
 import Table from '@/component/Table/Table';
 import HealthStatus from '@/component/HealthStatus/HealthStatus';
+import { UserContext } from '../../layout';
+import axios from 'axios';
 
 export default function Page() {
-  const [user, setUser] = useState(null);
+
+  const currentUser = useContext(UserContext);
+
+  const [myPatients, setMyPatients] = useState([]);
+
+  useEffect(() => {
+    const fetchMyPatients = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/get_patients_by_doctor_id/${currentUser.id}`)
+        
+        console.log(res.data.patients);
+        setMyPatients(res.data.patients);
+        
+      } catch (error) {
+        console.log("Error fetching my patients");
+      }
+    }
+
+    fetchMyPatients();
+  }, [currentUser])
+
   const labels = ["ID", "Name", "Admission Date"];
   return (
     <div>

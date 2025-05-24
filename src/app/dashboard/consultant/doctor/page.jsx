@@ -4,18 +4,24 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 
 function page() {
+    const currentUser = useContext(UserContext);
     const [myPatients, setMyPatients] = useState([]);
     const [selectedPatientId, setSelectedPatientId] = useState(null);
 
+    const [subject, setSubject] = useState("");
+    const [message, setMessage] = useState("");
+    const [selectedDate, setSelectedDate] = useState(null);
     useEffect(() => {
         const fetchMyPatients = async () => {
             try {
-                const res = await axios.get('')
+                const res = await axios.get(`http://localhost:5000/get_patients_by_doctor_id/${currentUser.id}`)
+                setMyPatients(res.data.patients);
             } catch (error) {
-                
+                console.log('error fetching', error)
             }
         }
-    })
+        fetchMyPatients();
+    }, [currentUser.id])
 
     const labels = ["Date", "Patient", "Subject", "Status"];
 
@@ -35,7 +41,7 @@ function page() {
                             </div>
                             <div className='flex flex-col gap-2 '>
                                 <div className='text-xl font-bold'>
-                                    <label className='text-gray-700' htmlFor='id' >Dr.</label>
+                                    <label className='text-gray-700' htmlFor='id' >Patient's Name: </label>
                                     <select onChange={(e) => setSelectedPatientId(Number(e.target.value))} className='border-b-2 border-blue-600 px-1' id='id'>
                                         <option value={''} hidden className=''>Select your patient</option>
                                         {myPatients.map((p) => (

@@ -18,7 +18,8 @@ function page() {
     useEffect(() => {
         const getMadeConsultants = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/get_made_consultants/${currentUser.id}`);
+                const res = await axios.get(`http://localhost:5000/get_made_consultants_patient_side/${currentUser.id}`);
+                console.log(res.data.consultants);
                 setMadeConsultants(res.data.consultants);
             } catch (error) {
                 console.log("Error getting consultants");
@@ -40,10 +41,10 @@ function page() {
 
     const handleSubmit = async () => {
         try {
-            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor, selectedDate})
+            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor, selectedDate, message})
             
         } catch (error) {
-            
+            console.log("Error while submitting consultant", error)
         }
     }
 
@@ -109,7 +110,7 @@ function page() {
                         </div>
                     </div>
 
-                    <form className="flex flex-col md:flex-row gap-6 mt-10">
+                    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-6 mt-10">
                         {/* Left Section */}
                         <div className="w-full md:w-1/2 space-y-4">
                             <div className="flex flex-col">

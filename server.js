@@ -52,7 +52,7 @@ app.post('/sign_up', async (req, res) => {
          VALUES (?)`,
         [userId]
       );
-      
+
       const patientID = patientResult.insertId;
 
       await db.query(
@@ -162,15 +162,50 @@ app.get('/get_doctors', async (req, res) => {
     return res.status(200).json({ message: "Get success", doctors });
   } catch (error) {
     console.log("Error fetching doctor data", error)
-    return res.status(500).json({message: "Error fetching doctor data"});
+    return res.status(500).json({ message: "Error fetching doctor data" });
   }
 })
+
+app.get('/get_doctor_by_patient_id/:patient_id', async (req, res) => {
+  try {
+    const { patient_id } = req.params;
+
+    const query = `
+      SELECT 
+        da.doctor_id,
+        u.name,
+        u.avatar,
+        u.gender,
+        d.expertise,
+        d.YoE,
+        da.status,
+        da.date_start,
+        da.date_end
+      FROM doctor_assignment da
+      JOIN doctors d ON d.doctor_id = da.doctor_id
+      JOIN users u ON u.user_id = d.doctor_id
+      WHERE da.patient_id = ?
+        AND da.status = 'Active'
+      ORDER BY da.date_start DESC
+      LIMIT 1
+    `;
+
+    const [rows] = await db.query(query, [patient_id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No active doctor assignment found for this patient' });
+    }
+    return res.status(200).json({ doctor: rows[0] });
+  } catch (error) {
+    console.log("Error get doctor from patient ID", error);
+    return res.status(500).json({ message: "Error getting doctor by patient ID" });
+  }
+});
 
 
 //get_all_patients
 app.get('/get_all_patients', async (req, res) => {
   try {
-    const [rows] = await db.execute(`
+    const [rows] = await db.query(`
       SELECT patient_id AS id, full_name AS name, dob, 
              TIMESTAMPDIFF(YEAR, dob, CURDATE()) AS age, gender 
       FROM patients
@@ -182,47 +217,108 @@ app.get('/get_all_patients', async (req, res) => {
   }
 });
 
-app.get('/get_made_consultants/:patient_id', async (req, res) => {
-  const patient_id = req.params;
+app.get('/get_patients_by_doctor_id/:doctor_id', async (req, res) => {
+  const { doctor_id } = req.params;
+
+  try {
+    const query = `
+      SELECT DISTINCT 
+        u.user_id AS patient_id,
+        u.name AS full_name,
+        u.email,
+        u.gender,
+        u.avatar
+      FROM consultant_request cr
+      JOIN patients p ON cr.patient_id = p.patient_id
+      JOIN users u ON p.patient_id = u.user_id
+      WHERE cr.doctor_id = ?
+    `;
+
+    const [patients] = await db.query(query, [doctor_id]);
+
+    return res.status(200).json({
+      message: "Fetched patients successfully",
+      patients
+    });
+  } catch (error) {
+    console.error("Error fetching patients by doctor_id", error);
+    return res.status(500).json({ message: "Server error while fetching patients" });
+  }
+});
+
+app.get('/get_made_consultants_patient_side/:patient_id', async (req, res) => {
+  const { patient_id } = req.params;
+  try {
+    const query = `
+      SELECT 
+        cr.date, 
+        d.full_name AS doctor_name, 
+        cr.subject, 
+        cr.status
+      FROM consultant_request cr
+      JOIN doctors d ON cr.doctor_id = d.id
+      WHERE cr.patient_id = ?
+      ORDER BY cr.date DESC
+    `;
+
+    const [consultants] = await db.query(query, [patient_id]);
+
+    return res.status(200).json({
+      message: "Fetched consultant requests successfully",
+      consultants
+    });
+  } catch (error) {
+    console.error("Error fetching consultant requests", error);
+    return res.status(500).json({ message: "Server error while fetching consultant requests" });
+  }
+});
+
+app.get('/get_made_consultants_patient_doctor/:patient_id/:doctor_id', async (req, res) => {
+  const { patient_id, doctor_id } = req.params;
+
   try {
     const query = `
       SELECT * FROM consultant_request
-      WHERE patient_id = ? AND status = 'Complete'
+      WHERE patient_id = ? AND doctor_id = ? AND status = 'Complete'
     `;
-    
-    const [consultants] = await db.query(query, [patient_id]);
 
-    return res.status(200).json({message: "Get consultants success", consultants});
+    const [consultants] = await db.query(query, [patient_id, doctor_id]);
+
+    return res.status(200).json({ message: "Get consultants success", consultants });
   } catch (error) {
     console.log("Error fetching made consultants", error)
-    return res.status(500).json({message: "Error fetching made consultants"});
+    return res.status(500).json({ message: "Error fetching made consultants" });
   }
 })
 
 app.post('/submit_consultant', async (req, res) => {
-  const {patient_id, doctor_id, selectedDate} = req.body;
+  const { patient_id, doctor_id, selectedDate, message } = req.body;
 
   try {
     const query = `
-      INSERT INTO consultant_request (doctor_id, patient_id)
+      INSERT INTO consultant_request (doctor_id, patient_id, date, message) VALUES (?, ?, ?, ?)
     `;
+
+    await db.query(query, [doctor_id, patient_id, selectedDate, message]);
+
+    return res.status(200).json({ message: "Submit consultant success" });
   } catch (error) {
-    
+    console.log("Error while submitting consultant", error)
+    return res.status(500).json({ message: "Error while submitting consultant" });
   }
 })
 
-//get_health_status_by_patient_id?id=P123
-app.get('/get_health_status_by_patient_id', async (req, res) => {
-  const { id } = req.query;
+app.get('/get_health_status_by_patient_id/:patient_id', async (req, res) => {
+  const { patient_id } = req.params;
 
-  if (!id) return res.status(400).json({ error: 'Missing patient_id' });
+  if (!patient_id) return res.status(400).json({ error: 'Missing patient_id' });
 
   try {
     const [rows] = await db.execute(`
       SELECT * FROM health_status 
       WHERE patient_id = ?
       ORDER BY recorded_at DESC
-    `, [id]);
+    `, [patient_id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'No health records found for this patient' });
