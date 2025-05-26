@@ -23,7 +23,7 @@ const getHealthStatusColor = (metric, value) => {
 
 import React from 'react'
 
-function HealthStatus() {
+function HealthStatus({temp, heart, pressure}) {
     const healthData = {
         temp: '36.8°C',
         heart: '72 bpm',
@@ -36,25 +36,25 @@ function HealthStatus() {
                 Health Status
             </h1>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className={`flex items-center p-4 rounded-md ${getHealthStatusColor('temp', healthData.temp)}`}>
+                <div className={`flex items-center p-4 rounded-md ${getHealthStatusColor('temp', temp ? temp : healthData.temp)}`}>
                     <FaThermometerHalf className="text-2xl mr-3" />
                     <div>
                         <p className="text-sm font-medium">TEMP</p>
-                        <p className="text-lg">{healthData.temp}</p>
+                        <p className="text-lg">{temp ? temp + "°C" : "N/A"}</p>
                     </div>
                 </div>
-                <div className={`flex items-center p-4 rounded-md ${getHealthStatusColor('heart', healthData.heart)}`}>
+                <div className={`flex items-center p-4 rounded-md ${getHealthStatusColor('heart', heart ? heart : healthData.heart)}`}>
                     <FaHeartbeat className="text-2xl mr-3" />
                     <div>
                         <p className="text-sm font-medium">HEART</p>
-                        <p className="text-lg">{healthData.heart}</p>
+                        <p className="text-lg">{heart ? heart + " bpm" : "N/A"}</p>
                     </div>
                 </div>
-                <div className={`flex items-center p-4 rounded-md ${getHealthStatusColor('pressure', healthData.pressure)}`}>
+                <div className={`flex items-center p-4 rounded-md ${getHealthStatusColor('pressure', pressure ? pressure : healthData.pressure)}`}>
                     <FaSyringe className="text-2xl mr-3" />
                     <div>
                         <p className="text-sm font-medium">PRESSURE</p>
-                        <p className="text-lg">{healthData.pressure}</p>
+                        <p className="text-lg">{pressure ? pressure + " mmHg" : "N/A"}</p>
                     </div>
                 </div>
             </div>

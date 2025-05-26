@@ -61,7 +61,7 @@ export default function RootLayout({ children }) {
 
                         <div className='flex items-center group cursor-pointer gap-4 relative'>
                             <div className='w-[35px] h-[35px]'>
-                                <Avatar img_url={user ? user.avatar : '/images/default_avatar.jpg'} />
+                                <Avatar img_url={user.avatar} />
                             </div>
 
                             <span className='text-base'>{user ? user.name : 'UserName'}</span>

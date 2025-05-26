@@ -13,6 +13,9 @@ export default function Page() {
 
   const [myPatients, setMyPatients] = useState([]);
 
+  const [selectedPatientData, setSelectedPatientData] = useState([]);
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+
   useEffect(() => {
     const fetchMyPatients = async () => {
       try {
@@ -29,6 +32,21 @@ export default function Page() {
     fetchMyPatients();
   }, [currentUser])
 
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      if (selectedPatientId) {
+        try {
+          const res = await axios.get(`http://localhost:5000/get_health_status_by_patient_id/${selectedPatientId}`);
+          setSelectedPatientId(res.data.patient);
+        } catch (error) {
+          console.log("Error fetching patient data");
+        }
+      }
+    }
+
+    fetchPatientData();
+  }, [selectedPatientId]);
+
   const labels = ["ID", "Name", "Admission Date"];
   return (
     <div>
@@ -44,7 +62,11 @@ export default function Page() {
           <h1 className="text-xl font-semibold mb-6 border-b pb-2 border-gray-200">
             Patient's Information
           </h1>
-          <InformationCard dataType={'Patient'} />
+          {selectedPatientId ? (
+            <InformationCard dataType={'Patient'} data={selectedPatientData} keys={['weight', 'age', 'height', 'gender']} />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
 

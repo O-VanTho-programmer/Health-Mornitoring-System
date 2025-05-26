@@ -1,8 +1,10 @@
 'use client';
 import React from 'react'
 import styles from './table.module.css';
+import { FaEye, FaMoneyCheck } from 'react-icons/fa';
 
-function Table({labels, data}) {
+function Table({ labels, data, keys, role, onViewDetail, setTypePopup }) {
+
     return (
         <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -16,10 +18,39 @@ function Table({labels, data}) {
                 <tbody className='max-h-[300px] overflow-hidden'>
                     {data && data.length > 0 ? (
                         data.map((row, idx) => (
-                            <tr key={idx} className={styles.tr}>
-                                {row.map((cell, cidx) => (
-                                    <td key={cidx}>{cell}</td>
+                            <tr key={idx}>
+                                {keys.map((key, labelIdx) => (
+                                    <td key={labelIdx}>
+                                        {row[key] || 'N/A'}
+                                    </td>
                                 ))}
+
+                                <td className="flex gap-2">
+                                    <button
+                                        className="cursor-pointer group flex items-center px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 hover:gap-1 transition-all"
+                                        onClick={() =>{
+                                            onViewDetail(row); 
+                                            setTypePopup('viewConsultant');
+                                        }}
+                                    >
+                                        <FaEye />
+                                        <span className="overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
+                                            View
+                                        </span>
+                                    </button>
+
+                                    {role === 'patient' && row.status === 'Accepted (Unpaid)' && (
+                                        <button
+                                            className="cursor-pointer group flex items-center px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 hover:gap-1 transition-all"
+                                        >
+                                            <FaMoneyCheck />
+                                            <span className="overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
+                                                Pay
+                                            </span>
+                                        </button>
+                                    )}
+                                </td>
+
                             </tr>
                         ))
                     ) : (

@@ -3,27 +3,36 @@ import React from 'react'
 import Avatar from '../Avatar/Avatar';
 import styles from './information_card.module.css';
 
-function InformationCard({ dataType }) {
+function InformationCard({ data, dataType, keys }) {
   let label = [];
 
   if (dataType === 'Patient') {
-    label = ["Full Name", "Weight", "Age", "Height", "Gender", "Health Score"];
+    label = ["Weight", "Age", "Height", "Gender"];
   } else {
-    label = ["Full Name", "Expertise", "Age", "YoE", "Gender"];
+    label = ["Expertise", "Age", "YoE", "Gender"];
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6">
-      <div className="w-[140px] h-[140px] border-3 border-blue-400 rounded-md overflow-hidden">
-        <Avatar img_url={'/images/default_avatar.jpg'} />
+    <div className="flex sm:flex-row items-center justify-between">
+      <div className='flex gap-[100px]'>
+        <div className="w-[160px] h-[160px] border-3 border-blue-400 rounded-full overflow-hidden">
+          <Avatar img_url={data.avatar ? data.avatar : '/images/default_avatar.jpg'} />
+        </div>
+
+        <div className='text-2xl self-start'>
+          <h1 className='role my-4 font-bold'>
+            {dataType === 'Patient' ? 'Patient\'s Information' : 'Doctor\'s Information'}
+          </h1>
+          <h1 className='name'>{data ? data.name : 'Unknown'}</h1>
+        </div>
       </div>
 
       <div className={styles.patient_info}>
-        {label.map((l) => {
+        {label.map((l, idx) => {
           return (
-            <div>
+            <div key={idx}>
               <label>{l}</label>
-              <span>Unknow</span>
+              <span>{data ? data[keys[idx]] : 'Unknown'}</span>
             </div>
           )
         })}

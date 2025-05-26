@@ -4,6 +4,7 @@ import Table from '@/component/Table/Table';
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../layout';
+import ViewConsultantPopup from '@/component/ViewConsultantPopup/ViewConsultantPopup';
 
 function page() {
     const currentUser = useContext(UserContext);
@@ -13,7 +14,10 @@ function page() {
 
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [typePopup, setTypePopup] = useState(''); 
 
     useEffect(() => {
         const getMadeConsultants = async () => {
@@ -52,18 +56,20 @@ function page() {
         }
 
         try {
-            const res = await axios.post(`http://localhost:5000/submit_consultant`, {patient_id: currentUser.id, doctor_id: selectedDoctor, selectedDate, message, subject})
-            
+            const res = await axios.post(`http://localhost:5000/submit_consultant`, { sender_id: currentUser.id, receiver_id: selectedDoctor, sender_role: 'patient', receiver_role: 'doctor', selectedDate, message, subject })
+
         } catch (error) {
             console.log("Error while submitting consultant", error)
         }
     }
 
-    const labels = ["Date", "Doctor", "Subject", "Status"];
+    const labels = ["Date", "Doctor", "Subject", "Status", ""];
+    const keys = ["date", "doctor_name", "subject", "status"];
+
     return (
         <div>
             <h1 className='title'>Made Consultants</h1>
-            <Table labels={labels} />
+            <Table labels={labels} data={madeConsultants} keys={keys} role={"patient"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest}/>
 
             <div className='mt-5'>
                 <h1 className='title'>New Consultant</h1>
@@ -143,6 +149,15 @@ function page() {
                     </form>
                 </div>
             </div>
+
+            {selectedRequest && (
+                <ViewConsultantPopup
+                    request={selectedRequest}
+                    onClose={() => setSelectedRequest(null)}
+                    type={typePopup}
+                    currentUser={currentUser}
+                />
+            )}
         </div>
     )
 }
