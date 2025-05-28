@@ -1,47 +1,10 @@
-.my-doctor-wrapper {
-  font-family: Arial, sans-serif;
-  background-color: #f1f4fa;
-  padding: 20px;
-}
-
-.my-doctor-container {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.doctor-info-card, .checkup-table {
+.checkup-table {
   background: white;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  margin-top: 2rem;
 }
-
-.doctor-info-card {
-  width: 300px;
-}
-
-.doctor-info-card img {
-  width: 100px;
-  border-radius: 50%;
-  display: block;
-  margin: 0 auto 10px;
-}
-
-.info-item {
-  margin: 8px 0;
-  font-size: 14px;
-}
-
-.info-label {
-  font-weight: bold;
-  color: #555;
-}
-
-.checkup-table {
-  flex: 1;
-}
-
 
 .make-consultant-btn {
   margin-top: 20px;

@@ -1,9 +1,9 @@
 'use client';
 import HealthStatus from '@/component/HealthStatus/HealthStatus'
-import InformationCard from '@/component/InformationCard/InformationCard';
 import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../layout';
 import axios from 'axios';
+import InformationCard from '@/component/InformationCard/InformationCard';
 
 function page() {
 
@@ -23,7 +23,7 @@ function page() {
     <>
       {patientData ? (
           <div>
-            <InformationCard dataType={'Patient'} data={patientData} keys={['weight', 'age', 'height', 'gender']} />
+            <InformationCard user={patientData} />
             <HealthStatus temp={patientData.temperature} heart={patientData.heart_rate} pressure={patientData.blood_pressure} />
 
           </div >

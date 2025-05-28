@@ -4,16 +4,23 @@ import "./my_doctor.css";
 import Table from "@/component/Table/Table";
 import { UserContext } from "../layout";
 import axios from "axios";
-import Avatar from "@/component/Avatar/Avatar";
 import ViewConsultantPopup from "@/component/ViewConsultantPopup/ViewConsultantPopup";
+import InformationCard from "@/component/InformationCard/InformationCard";
+import QuickMakeConsultant from "@/component/QuickMakeConsultant/QuickMakeConsultant";
+import Payment from "@/component/Payment/Payment";
 
 export default function MyDoctor() {
   const currentUser = useContext(UserContext);
 
   const [myDoctor, setMyDoctor] = useState(null);
   const [madeDoctorConsultants, setMadeDoctorConsultants] = useState([]);
+
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [typePopup, setTypePopup] = useState('');
+  const [openQuickConsultant, setOpenQuickConsultant] = useState(false);
+
+  const [openPaymentPopup, setOpenPaymentPopup] = useState(false);
+  const [openViewPopup, setOpenViewPopup] = useState(false);
 
   useEffect(() => {
     const fetchDoctorData = async () => {
@@ -53,40 +60,44 @@ export default function MyDoctor() {
     <>
       {myDoctor ? (
         <div className="my-doctor-wrapper">
-          <h2>My Doctor</h2>
-          <div className="my-doctor-container">
-            <div className="doctor-info-card">
-              <Avatar img_url={myDoctor.avatar} />
-              <div className="info-item"><span className="info-label">Full Name:</span> {myDoctor.doctor_name}</div>
-              <div className="info-item"><span className="info-label">Specialty:</span> {myDoctor.expertise}</div>
-              <div className="info-item"><span className="info-label">Years of Experience:</span> {myDoctor.YoE}</div>
-              <div className="info-item"><span className="info-label">Email:</span> {myDoctor.email}</div>
-            </div>
+          <InformationCard user={myDoctor} />
 
-            <div className="checkup-table">
-              <h3>Consultants History</h3>
-              {madeDoctorConsultants.length === 0 ? (
-                <>
-                  <p>No consultant history available.</p>
-                </>
-              ) : (
-                <>
-                  <Table labels={labels} data={madeDoctorConsultants} keys={keys} role={"patient"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest} />
-                </>
-              )}
+          <div className="checkup-table">
+            <h3>Consultants History</h3>
+            {madeDoctorConsultants.length === 0 ? (
+              <>
+                <p>No consultant history available.</p>
+              </>
+            ) : (
+              <>
+                <Table labels={labels} data={madeDoctorConsultants} keys={keys} role={"patient"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest} setOpenViewPopup={setOpenViewPopup} onPay={setSelectedRequest} setOpenPaymentPopup={setOpenPaymentPopup} />
+              </>
+            )}
 
-              <button className="make-consultant-btn">Make Consultant</button>
+            <button onClick={() => setOpenQuickConsultant(true)} className="make-consultant-btn">Make Consultant</button>
 
-            </div>
           </div>
-          {selectedRequest && (
+
+          {selectedRequest && openViewPopup && (
             <ViewConsultantPopup
               request={selectedRequest}
-              onClose={() => setSelectedRequest(null)}
+              onClose={() => { setOpenViewPopup(false); setSelectedRequest(null) }}
               type={typePopup}
               currentUser={currentUser}
             />
           )}
+
+          {selectedRequest && openPaymentPopup && (
+            <Payment
+              onClose={() => { setOpenPaymentPopup(false); setSelectedRequest(null) }}
+              data={selectedRequest}
+            />
+          )}
+
+          {openQuickConsultant && (
+            <QuickMakeConsultant myDoctor={myDoctor} currentUser={currentUser} onClose={() => setOpenQuickConsultant(false)} />
+          )}
+
         </div >
       ) : (
         <div>Loading...</div>

@@ -177,6 +177,7 @@ app.get('/get_doctor_by_patient_id/:patient_id', async (req, res) => {
         u.avatar,
         u.gender,
         u.email,
+        u.role,
         d.expertise,
         d.YoE,
         da.status,
@@ -230,6 +231,7 @@ app.get('/get_made_consultants_patient_doctor/:patient_id/:doctor_id', async (re
         cr.status,
         cr.message,
         cr.price,
+        cr.sender_id,
         u.name AS doctor_name
       FROM consultant_request cr
       JOIN users u ON 
@@ -271,7 +273,6 @@ app.get('/get_made_consultants_by_doctor_id/:doctor_id', async (req, res) => {
         (cr.receiver_id = ? AND cr.sender_id = u.user_id)
       WHERE 
         (cr.sender_id = ? OR cr.receiver_id = ?) 
-        AND cr.status != 'Pending'
       ORDER BY cr.date DESC
     `;
 
@@ -317,6 +318,40 @@ app.get('/get_consultant_requests_by_doctor_id/:doctor_id', async (req, res) => 
   }
 });
 
+app.get('/get_consultant_request_to_patient/:patient_id', async (req, res) => {
+  const { patient_id } = req.params;
+
+  try {
+    const query = `
+      SELECT 
+        cr.request_id,
+        DATE_FORMAT(cr.date, '%d/%m/%Y') AS date,
+        u.name AS doctor_name,
+        cr.subject,
+        cr.status,
+        cr.message,
+        cr.price,
+        cr.sender_id
+      FROM consultant_request cr
+      JOIN users u ON 
+        (cr.sender_role = 'doctor' AND cr.sender_id = u.user_id)
+      WHERE 
+        (cr.receiver_id = ? AND cr.receiver_role = 'patient')
+      ORDER BY cr.date DESC
+    `;
+
+    const [requests] = await db.query(query, [patient_id]);
+
+    return res.status(200).json({
+      message: "Fetched consultant requests for patient successfully",
+      requests
+    });
+  } catch (error) {
+    console.error("Error fetching consultant requests for patient", error);
+    return res.status(500).json({ message: "Error fetching consultant requests for patient" });
+  }
+});
+
 app.post('/accept_consultant', async (req, res) => {
   const { request_id, price } = req.body;
   await db.query(
@@ -337,14 +372,14 @@ app.post('/reject_consultant', async (req, res) => {
 
 
 app.post('/submit_consultant', async (req, res) => {
-  const { sender_id, receiver_id, sender_role, receiver_role, selectedDate, message, subject } = req.body;
+  const { sender_id, receiver_id, sender_role, receiver_role, selectedDate, message, subject, price } = req.body;
 
   try {
     const query = `
-      INSERT INTO consultant_request (sender_id, receiver_id, sender_role, receiver_role, date, subject, message, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')
+      INSERT INTO consultant_request (sender_id, receiver_id, sender_role, receiver_role, date, subject, message, status, price)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', ?)
     `;
-    await db.query(query, [sender_id, receiver_id, sender_role, receiver_role, selectedDate, subject, message]);
+    await db.query(query, [sender_id, receiver_id, sender_role, receiver_role, selectedDate, subject, message, price]);
 
     return res.status(200).json({ message: "Consultant request submitted successfully" });
   } catch (error) {
@@ -369,18 +404,34 @@ app.post('/remove_consultant', async (req, res) => {
   }
 });
 
-app.get('/get_health_status_by_patient_id/:patient_id', async (req, res) => {
+app.get('/get_health_status_by_patient_id/:patient_id/', async (req, res) => {
   const { patient_id } = req.params;
 
   if (!patient_id) return res.status(400).json({ error: 'Missing patient_id' });
 
   try {
     const [rows] = await db.query(`
-      SELECT u.name, u.avatar, u.gender, u.dob, p.age, hs.height, hs.weight, hs.temperature, hs.blood_pressure, hs.heart_rate FROM users u
+      SELECT 
+        u.name,
+        u.avatar, 
+        u.gender, 
+        u.role,
+        u.email,
+        DATE_FORMAT(u.dob, '%d/%m/%Y') AS dob,
+        DATE_FORMAT(da.date_start, '%d/%m/%Y') AS date_start,
+        p.age, 
+        hs.height, 
+        hs.weight, 
+        hs.temperature, 
+        hs.blood_pressure, 
+        hs.heart_rate 
+      FROM users u
       JOIN health_status hs ON u.user_id = hs.patient_id
       JOIN patients p ON u.user_id = p.patient_id
+      JOIN doctor_assignment da ON da.patient_id = p.patient_id AND da.status = "Active"
       WHERE u.user_id = ?
       ORDER BY hs.recorded_at DESC
+      LIMIT 1
     `, [patient_id]);
 
     if (rows.length === 0) {
@@ -435,28 +486,31 @@ app.get('/get_patients_by_doctor_id/:doctor_id', async (req, res) => {
   const { doctor_id } = req.params;
 
   try {
-    // const query = `
-    //   SELECT 
-    //     u.user_id AS patient_id,
-    //     u.name AS full_name,
-    //     u.email,
-    //     u.gender,
-    //     u.avatar
-    //   FROM consultant_request cr
-    //   JOIN patients p ON cr.patient_id = p.patient_id
-    //   JOIN users u ON p.patient_id = u.user_id
-    //   WHERE cr.doctor_id = ?
-    // `;
+    const query = `
+      SELECT 
+        u.user_id AS id,
+        u.name AS full_name,
+        p.age,
+        u.gender,
+        u.avatar,
+        DATE_FORMAT(u.dob, '%d/%m/%Y') AS dob,
+        DATE_FORMAT(da.date_start, '%d/%m/%Y') AS date_start,
+        da.status
+      FROM doctor_assignment da
+      JOIN patients p ON da.patient_id = p.patient_id
+      JOIN users u ON p.patient_id = u.user_id
+      WHERE da.doctor_id = ?
+    `;
 
-    // const [patients] = await db.query(query, [doctor_id]);
+    const [patients] = await db.query(query, [doctor_id]);
 
     return res.status(200).json({
-      message: "Fetched patients successfully",
+      message: "Fetched assigned patients successfully",
       patients
     });
   } catch (error) {
-    console.error("Error fetching patients by doctor_id", error);
-    return res.status(500).json({ message: "Server error while fetching patients" });
+    console.error("Error fetching assigned patients", error);
+    return res.status(500).json({ message: "Server error while fetching assigned patients" });
   }
 });
 

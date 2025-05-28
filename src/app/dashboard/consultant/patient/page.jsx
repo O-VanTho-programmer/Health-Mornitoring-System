@@ -5,6 +5,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../layout';
 import ViewConsultantPopup from '@/component/ViewConsultantPopup/ViewConsultantPopup';
+import Payment from '@/component/Payment/Payment';
 
 function page() {
     const currentUser = useContext(UserContext);
@@ -17,7 +18,13 @@ function page() {
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const [selectedRequest, setSelectedRequest] = useState(null);
-    const [typePopup, setTypePopup] = useState(''); 
+    const [typePopup, setTypePopup] = useState('');
+
+    const [selectedRequestFromDoctor, setSelectedRequestFromDoctor] = useState(null);
+    const [requestConsultant, setRequestConsultant] = useState([]);
+
+    const [openPaymentPopup, setOpenPaymentPopup] = useState(false);
+    const [openViewPopup, setOpenViewPopup] = useState(false);
 
     useEffect(() => {
         const getMadeConsultants = async () => {
@@ -39,8 +46,19 @@ function page() {
             }
         }
 
+        const getRequestConsultant = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/get_consultant_request_to_patient/${currentUser.id}`);
+                setRequestConsultant(res.data.requests);
+            } catch (error) {
+                console.log("Error while getting request consultant", error)
+                
+            }
+        }
+
         getMadeConsultants();
         getDoctorsData();
+        getRequestConsultant();
     }, [])
 
     const handleSubmit = async (e) => {
@@ -68,8 +86,41 @@ function page() {
 
     return (
         <div>
-            <h1 className='title'>Made Consultants</h1>
-            <Table labels={labels} data={madeConsultants} keys={keys} role={"patient"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest}/>
+            <div className='flex justify-between gap-5'>
+                <div className='flex-2/3'>
+                    <h1 className='title'>Made Consultants</h1>
+                    <Table labels={labels} data={madeConsultants} keys={keys} role={"patient"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest} setOpenViewPopup={setOpenViewPopup} onPay={setSelectedRequest} setOpenPaymentPopup={setOpenPaymentPopup} />
+                </div>
+
+                <div className="p-4 bg-white rounded-xl min-w-[400px] shadow-lg border border-gray-200">
+                    <h2 className="text-xl font-semibold text-[#4e73df] mb-4">🗂️ Consultant Requests</h2>
+
+                    {requestConsultant.length === 0 ? (
+                        <div className="text-center text-sm text-gray-500 italic">No consultant requests</div>
+                    ) : (
+                        <div className="flex flex-col gap-4">
+                            {requestConsultant.map((request) => (
+                                <div
+                                    key={request.id}
+                                    className="flex justify-between items-start bg-gray-50 hover:shadow transition-shadow duration-200 border border-gray-200 rounded-lg p-4"
+                                >
+                                    <div>
+                                        <div className="font-medium text-gray-800">{request.doctor_name}</div>
+                                        <div className="text-sm text-gray-600 mt-1">{request.subject}</div>
+                                        <div className="text-xs text-gray-400 mt-1">📅 {request.date}</div>
+                                    </div>
+                                    <button
+                                        className="text-[#4e73df] cursor-pointer font-medium hover:underline hover:text-[#3c5cc5] transition duration-150"
+                                        onClick={() => { setSelectedRequestFromDoctor(request); setTypePopup('viewRequest'); setOpenViewPopup(true); }}
+                                    >
+                                        View Details
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <div className='mt-5'>
                 <h1 className='title'>New Consultant</h1>
@@ -150,12 +201,19 @@ function page() {
                 </div>
             </div>
 
-            {selectedRequest && (
+            {(selectedRequest || selectedRequestFromDoctor) && openViewPopup && (
                 <ViewConsultantPopup
-                    request={selectedRequest}
-                    onClose={() => setSelectedRequest(null)}
+                    request={selectedRequest || selectedRequestFromDoctor}
+                    onClose={() => { setOpenViewPopup(false); setSelectedRequest(null); setSelectedRequestFromDoctor(null);}}
                     type={typePopup}
                     currentUser={currentUser}
+                />
+            )}
+
+            {selectedRequest && openPaymentPopup && (
+                <Payment
+                    onClose={() => { setOpenPaymentPopup(false); setSelectedRequest(null) }}
+                    data={selectedRequest}
                 />
             )}
         </div>

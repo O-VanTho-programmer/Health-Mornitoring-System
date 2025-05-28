@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
+import Avatar from '../Avatar/Avatar';
 
-function QuickMakeConsultant({ myDoctor, currentUser }) {
+function QuickMakeConsultant({ myDoctor, currentUser, onClose }) {
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());

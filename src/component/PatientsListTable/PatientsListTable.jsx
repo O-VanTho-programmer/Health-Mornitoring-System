@@ -1,10 +1,8 @@
-'use client';
 import React from 'react'
-import styles from './table.module.css';
-import { FaEye, FaMoneyCheck } from 'react-icons/fa';
+import styles from '../Table/table.module.css';
+import { FaEye } from 'react-icons/fa';
 
-function Table({ labels, data, keys, role, onViewDetail, onPay, setTypePopup, setOpenViewPopup, setOpenPaymentPopup }) {
-
+function PatientsListTable({ labels, keys, data, setSelectedPatientId }) {
     return (
         <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -25,13 +23,11 @@ function Table({ labels, data, keys, role, onViewDetail, onPay, setTypePopup, se
                                     </td>
                                 ))}
 
-                                <td className="w-[110px] flex gap-2">
+                                <td className="w-[110px]">
                                     <button
                                         className="cursor-pointer group flex items-center px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 hover:gap-1 transition-all"
                                         onClick={() => {
-                                            onViewDetail(row);
-                                            setOpenViewPopup(true);
-                                            setTypePopup('viewConsultant');
+                                            setSelectedPatientId(row.id);
                                         }}
                                     >
                                         <FaEye />
@@ -39,23 +35,7 @@ function Table({ labels, data, keys, role, onViewDetail, onPay, setTypePopup, se
                                             View
                                         </span>
                                     </button>
-
-                                    {role === 'patient' && row.status === 'Accepted (Unpaid)' && (
-                                        <button
-                                            className="cursor-pointer group flex items-center px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 hover:gap-1 transition-all"
-                                            onClick={() => {
-                                                onPay(row);
-                                                setOpenPaymentPopup(true)
-                                            }}
-                                        >
-                                            <FaMoneyCheck />
-                                            <span className="overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
-                                                Pay
-                                            </span>
-                                        </button>
-                                    )}
                                 </td>
-
                             </tr>
                         ))
                     ) : (
@@ -69,4 +49,4 @@ function Table({ labels, data, keys, role, onViewDetail, onPay, setTypePopup, se
     )
 }
 
-export default Table
+export default PatientsListTable

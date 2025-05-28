@@ -14,6 +14,18 @@ function page() {
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
     const [selectedDate, setSelectedDate] = useState(null);
+    const [price, setPrice] = useState(Number(50));
+
+    const handleChangePrice = (e) => {
+        const value = Number(e.target.value);
+
+        if (value < 50) {
+            setPrice(50);
+            return;
+        }
+
+        setPrice(value);
+    }
 
     const [madeConsultants, setMadeConsultants] = useState([]);
 
@@ -82,12 +94,12 @@ function page() {
         }
         fetchMadeConsultants();
 
-        
+
     }, [currentUser.id])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedPatientId || !selectedDate || !subject || !message) {
+        if (!selectedPatientId || !selectedDate || !subject || !message || !price) {
             console.log("All fields are required");
             return;
         }
@@ -98,7 +110,7 @@ function page() {
         }
 
         try {
-            const res = await axios.post(`http://localhost:5000/submit_consultant`, { sender_id: currentUser.id, receiver_id: selectedPatientId, sender_role: 'doctor', receiver_role: 'patient', selectedDate, message, subject })
+            const res = await axios.post(`http://localhost:5000/submit_consultant`, { sender_id: currentUser.id, receiver_id: selectedPatientId, sender_role: 'doctor', receiver_role: 'patient', selectedDate, message, subject, price })
 
         } catch (error) {
             console.log("Error while submitting consultant", error)
@@ -112,7 +124,7 @@ function page() {
             <div className='flex justify-between gap-5'>
                 <div className='flex-2/3'>
                     <h1 className='title'>Made Consultants</h1>
-                    <Table labels={labels} keys={keys} data={madeConsultants} role={"doctor"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest}/>
+                    <Table labels={labels} keys={keys} data={madeConsultants} role={"doctor"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest} />
                 </div>
 
                 <div className="p-4 bg-white rounded-xl min-w-[400px] shadow-lg border border-gray-200">
@@ -134,7 +146,7 @@ function page() {
                                     </div>
                                     <button
                                         className="text-[#4e73df] cursor-pointer font-medium hover:underline hover:text-[#3c5cc5] transition duration-150"
-                                        onClick={() => {setSelectedRequest(request); setTypePopup('viewRequest')}}
+                                        onClick={() => { setSelectedRequest(request); setTypePopup('viewRequest') }}
                                     >
                                         View Details
                                     </button>
@@ -162,7 +174,7 @@ function page() {
                                     <select onChange={(e) => setSelectedPatientId(Number(e.target.value))} className='border-b-2 border-blue-600 px-1' id='id'>
                                         <option value={''} hidden className=''>Select your patient</option>
                                         {myPatients.map((p) => (
-                                            <option key={p.patient_id} value={p.patient_id}>{p.name}</option>
+                                            <option key={p.id} value={p.id}>{p.full_name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -171,7 +183,7 @@ function page() {
                                     <label className='label' htmlFor='gender' >Gender: </label>
                                     <span className='span' id='gender'>
                                         {selectedPatientId !== null ?
-                                            (myPatients.find(d => d.patient_id == selectedPatientId)?.gender || 'Unknow')
+                                            (myPatients.find(d => d.id == selectedPatientId)?.gender || 'Unknow')
                                             : ("Unknown")}
                                     </span>
                                 </div>
@@ -180,7 +192,7 @@ function page() {
                                     <label className='label' htmlFor='age' >Age: </label>
                                     <span className='span' id='age'>
                                         {selectedPatientId !== null ?
-                                            (myPatients.find(d => d.patient_id === selectedPatientId)?.age || 'Unknown')
+                                            (myPatients.find(d => d.id === selectedPatientId)?.age || 'Unknown')
                                             : ("Unknown")}
                                     </span>
                                 </div>
@@ -190,7 +202,7 @@ function page() {
                                     <span className='span' id='dob'>
                                         <span className='span' id='dob'>
                                             {selectedPatientId !== null ?
-                                                (myPatients.find(d => d.patient_id === selectedPatientId)?.dob || 'Unknown')
+                                                (myPatients.find(d => d.id === selectedPatientId)?.dob || 'Unknown')
                                                 : ("Unknown")}
                                         </span>
                                     </span>
@@ -206,13 +218,20 @@ function page() {
                     <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-6 mt-10">
                         {/* Left Section */}
                         <div className="w-full md:w-1/2 space-y-4">
-                            <div className="flex flex-col">
-                                <label className="label mb-1" htmlFor="date">Date:</label>
-                                <input value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} type="date" id="date" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <div className='flex gap-5'>
+                                <div className="">
+                                    <label className="label block mb-1" htmlFor="date">Date:</label>
+                                    <input value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} type="date" id="date" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+
+                                <div className="">
+                                    <label className="label block mb-1" htmlFor="price">Set Price:</label>
+                                    <input value={price} onChange={handleChangePrice} type="number" id="price" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
                             </div>
 
-                            <div className="flex flex-col">
-                                <label className="label mb-1" htmlFor="subject">Subject:</label>
+                            <div className="">
+                                <label className="label block mb-1" htmlFor="subject">Subject:</label>
                                 <input value={subject} onChange={(e) => setSubject(e.target.value)} type="text" id="subject" className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
                         </div>
