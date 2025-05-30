@@ -1,41 +1,63 @@
 import React, { useState } from 'react'
 import Avatar from '../Avatar/Avatar';
+import { IoClose } from "react-icons/io5";
+import axios from 'axios';
+import Alert from '../Alert/Alert';
 
 function QuickMakeConsultant({ myDoctor, currentUser, onClose }) {
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());
+    
+    const [alert, setAlert] = useState("");
+    const [typeAlert, setTypeAlert] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedDate || !subject || !message) {
-            console.log("All fields are required");
+            setAlert("All fields are required");
+            setTypeAlert("danger");
             return;
         }
 
         if (new Date(selectedDate) < new Date()) {
-            console.log("Date should be in the future");
+            setAlert("Date should be in the future");
+            setTypeAlert("danger");
             return;
         }
 
         try {
             const res = await axios.post(`http://localhost:5000/submit_consultant`, { sender_id: currentUser.id, receiver_id: myDoctor.doctor_id, sender_role: 'patient', receiver_role: 'doctor', selectedDate, message, subject })
-            if (res.data.success) {
-                console.log("Consultant submitted successfully");
+            if (res.status === 200) {
+                setAlert("Consultant submitted successfully");
+                setTypeAlert("success");
+
                 setSubject("");
                 setMessage("");
                 setSelectedDate(new Date());
             }
         } catch (error) {
             console.log("Error while submitting consultant", error)
+            setAlert("Failed to submit consultant. Please try again.");
+            setTypeAlert("danger");
+        } finally {
+            setTimeout(() => {
+                setAlert('');
+                setTypeAlert('');
+            }, 3000);
         }
     }
 
     return (
-        <div className='mt-5'>
-            <h1 className='title'>New Consultant</h1>
-
-            <div className='p-6 bg-white shadow-md rounded-md'>
+        <div className='fixed flex items-center justify-center z-50 w-screen h-screen top-0 left-0 '>
+            {alert && (
+                <Alert message={alert} type={typeAlert} />
+            )}
+            <div className='absolute w-full h-full bg-black opacity-20'></div>
+            <div className='relative p-6 bg-white shadow-md rounded-md z-10'>
+                <button onClick={onClose} className='absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer'>
+                    <IoClose size={35} />
+                </button>
                 <div className='flex'>
                     <div className='flex gap-5'>
                         <div className="w-[140px] h-[140px] border-3 border-blue-400 rounded-md overflow-hidden">

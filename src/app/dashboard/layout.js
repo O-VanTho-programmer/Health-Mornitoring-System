@@ -9,11 +9,13 @@ import { FaUserDoctor } from "react-icons/fa6";
 import { BiSolidConversation } from "react-icons/bi";
 import logout from '@/utils/logout';
 import axios from 'axios';
+import { usePathname } from 'next/navigation';
 
 export const UserContext = createContext(null);
 
 export default function RootLayout({ children }) {
 
+    const pathname = usePathname();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -45,11 +47,12 @@ export default function RootLayout({ children }) {
                     <h2>Health Mornitoring System</h2>
 
                     <ul className={styles.side_nav}>
-                        <li><a href={`/dashboard/health_status/${user.role === 'patient' ? 'patient' : 'doctor'}`}><RiHealthBookFill size={28} /> Health Status</a></li>
+                        <li><a className={pathname.includes('/dashboard/health_status') ? 'active' : ''} 
+                        href={`/dashboard/health_status/${user.role === 'patient' ? 'patient' : 'doctor'}`}><RiHealthBookFill size={28} /> Health Status</a></li>
                         {user.role === 'patient' && (
-                            <li><a href={`/dashboard/my_doctor`}><FaUserDoctor size={28} />My Doctor</a></li>
+                            <li><a className={pathname.includes('/dashboard/my_doctor') ? 'active' : ''} href={`/dashboard/my_doctor`}><FaUserDoctor size={28} />My Doctor</a></li>
                         )}
-                        <li><a href={`/dashboard/consultant/${user.role === 'patient' ? 'patient' : 'doctor'}`}><BiSolidConversation size={28} /> Consultant</a></li>
+                        <li><a className={pathname.includes('/dashboard/consultant') ? 'active' : ''} href={`/dashboard/consultant/${user.role === 'patient' ? 'patient' : 'doctor'}`}><BiSolidConversation size={28} /> Consultant</a></li>
                         <li> <a href='' onClick={logout}><IoExit size={28} /> Logout</a> </li>
                     </ul>
 
@@ -68,8 +71,11 @@ export default function RootLayout({ children }) {
                             <FaAngleDown />
 
                             <ul className='hidden absolute group-hover:block top-full right-0 bg-white shadow'>
-                                <li><a>Profile</a></li>
-                                <li><a href='/dashboard/doctor/health_status'>Health Status</a></li>
+                                {user.role === 'patient' && (
+                                    <li><a href='/dashboard/my_doctor'>My Doctor</a></li>
+                                )}
+                                <li><a href={user.role === 'patient' ? '/dashboard/health_status/patient' : '/dashboard/health_status/doctor'}>Health Status</a></li>
+                                <li><a href={user.role === 'patient' ? '/dashboard/consultant/patient' : '/dashboard/consultant/doctor'}>Consultants</a></li>
                                 <li><a onClick={logout}>Logout <IoExit /></a></li>
                             </ul>
                         </div>

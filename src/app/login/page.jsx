@@ -2,10 +2,13 @@
 import React, { useState } from 'react';
 import styles from './login.module.css';
 import axios from 'axios';
+import Alert from '@/component/Alert/Alert';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [alert, setAlert] = useState('');
+  const [typeAlert, setTypeAlert] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,13 +18,23 @@ function LoginPage() {
       if (res.status === 200) {
         window.location.href = '/dashboard'
       }
+
     } catch (error) {
       console.log("Error Login", error);
+      setAlert(error.response.data.message);
+      setTypeAlert("danger");
+      
+      setTimeout(() => {
+        setAlert('');
+      }, 3000);
     }
   };
 
   return (
     <div className={styles.container}>
+      {alert && (
+        <Alert message={alert} type={typeAlert} />
+      )}
       <div className={styles.wrapper}>
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>

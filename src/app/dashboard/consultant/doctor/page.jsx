@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../layout';
 import Avatar from '@/component/Avatar/Avatar';
 import ViewConsultantPopup from '@/component/ViewConsultantPopup/ViewConsultantPopup';
+import Alert from '@/component/Alert/Alert';
 
 function page() {
     const currentUser = useContext(UserContext);
@@ -15,6 +16,9 @@ function page() {
     const [message, setMessage] = useState("");
     const [selectedDate, setSelectedDate] = useState(null);
     const [price, setPrice] = useState(Number(50));
+
+    const [alert, setAlert] = useState("");
+    const [typeAlert, setTypeAlert] = useState("");
 
     const handleChangePrice = (e) => {
         const value = Number(e.target.value);
@@ -39,7 +43,9 @@ function page() {
                 request_id: selectedRequest.request_id,
                 price,
             });
-            alert('Consultant accepted!');
+            setAlert("Consultant accepted successfully");
+            setTypeAlert("success");
+
             setSelectedRequest(null);
         } catch (err) {
             console.error(err);
@@ -51,14 +57,23 @@ function page() {
             await axios.post('http://localhost:5000/reject_consultant', {
                 request_id: selectedRequest.request_id,
             });
-            alert('Consultant rejected.');
+            setAlert("Consultant rejected successfully");
+            setTypeAlert("success");
             setSelectedRequest(null);
         } catch (err) {
             console.error(err);
         }
     };
 
-    // 
+    const fetchMadeConsultants = async () => {
+        try {
+            const res = await axios.get(`http://localhost:5000/get_made_consultants_by_doctor_id/${currentUser.id}`);
+
+            setMadeConsultants(res.data.consultants);
+        } catch (error) {
+            console.error('Error fetching made consultants:', error);
+        }
+    }
 
     useEffect(() => {
         const fetchMyPatients = async () => {
@@ -81,39 +96,42 @@ function page() {
             }
         }
         fetchConsultantRequests();
-
-        const fetchMadeConsultants = async () => {
-            try {
-                const res = await axios.get(`http://localhost:5000/get_made_consultants_by_doctor_id/${currentUser.id}`);
-
-                console.log(res.data.consultants);
-                setMadeConsultants(res.data.consultants);
-            } catch (error) {
-                console.error('Error fetching made consultants:', error);
-            }
-        }
         fetchMadeConsultants();
-
-
     }, [currentUser.id])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedPatientId || !selectedDate || !subject || !message || !price) {
-            console.log("All fields are required");
+            setAlert("All fields are required");
+            setTypeAlert("danger");
             return;
         }
 
         if (new Date(selectedDate) < new Date()) {
-            console.log("Date should be in the future");
+            setAlert("Date should be in the future");
+            setTypeAlert("danger");
             return;
         }
 
         try {
             const res = await axios.post(`http://localhost:5000/submit_consultant`, { sender_id: currentUser.id, receiver_id: selectedPatientId, sender_role: 'doctor', receiver_role: 'patient', selectedDate, message, subject, price })
+            if (res.status === 200) {
+                setAlert("Consultant submitted successfully");
+                setTypeAlert("success");
 
+                setSubject("");
+                setMessage("");
+                setSelectedDate(null);
+                setPrice(50);
+                setSelectedPatientId(null);
+
+                // Update lai 
+                fetchMadeConsultants();
+            }
         } catch (error) {
-            console.log("Error while submitting consultant", error)
+            console.log("Error while submitting consultant", error);
+            setAlert("Failed to submit consultant. Please try again.");
+            setTypeAlert("danger");
         }
     }
 
@@ -121,13 +139,16 @@ function page() {
     const keys = ["date", "patient_name", "subject", "status"];
     return (
         <div>
+            {alert && (
+                <Alert message={alert} type={typeAlert} />
+            )}
             <div className='flex justify-between gap-5'>
                 <div className='flex-2/3'>
                     <h1 className='title'>Made Consultants</h1>
                     <Table labels={labels} keys={keys} data={madeConsultants} role={"doctor"} setTypePopup={setTypePopup} onViewDetail={setSelectedRequest} />
                 </div>
 
-                <div className="p-4 bg-white rounded-xl min-w-[400px] shadow-lg border border-gray-200">
+                <div className="p-4 bg-white rounded-xl min-w-[340px] shadow-lg border border-gray-200">
                     <h2 className="text-xl font-semibold text-[#4e73df] mb-4">🗂️ Consultant Requests</h2>
 
                     {requestConsultant.length === 0 ? (

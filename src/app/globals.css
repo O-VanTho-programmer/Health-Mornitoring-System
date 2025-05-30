@@ -25,6 +25,11 @@
   color: rgb(52, 52, 52);
 }
 
+.active {
+  background: var(--background);
+  color: #224abe;
+}
+
 /*text-xl font-semibold mb-4 border-b pb-2  */
 
 .label {
