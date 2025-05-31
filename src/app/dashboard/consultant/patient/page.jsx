@@ -21,7 +21,6 @@ function page() {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [typePopup, setTypePopup] = useState('');
 
-    const [selectedRequestFromDoctor, setSelectedRequestFromDoctor] = useState(null);
     const [requestConsultant, setRequestConsultant] = useState([]);
 
     const [openPaymentPopup, setOpenPaymentPopup] = useState(false);
@@ -103,6 +102,34 @@ function page() {
         }
     }
 
+    const handleAccept = async (price) => {
+        try {
+            await axios.post('http://localhost:5000/accept_consultant', {
+                request_id: selectedRequest.request_id,
+                price,
+            });
+            setAlert("Consultant accepted successfully");
+            setTypeAlert("success");
+
+            setSelectedRequest(null);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleReject = async () => {
+        try {
+            await axios.post('http://localhost:5000/reject_consultant', {
+                request_id: selectedRequest.request_id,
+            });
+            setAlert("Consultant rejected successfully");
+            setTypeAlert("success");
+            setSelectedRequest(null);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const labels = ["Date", "Doctor", "Subject", "Status", ""];
     const keys = ["date", "doctor_name", "subject", "status"];
 
@@ -136,7 +163,7 @@ function page() {
                                     </div>
                                     <button
                                         className="text-[#4e73df] cursor-pointer font-medium hover:underline hover:text-[#3c5cc5] transition duration-150"
-                                        onClick={() => { setSelectedRequestFromDoctor(request); setTypePopup('viewRequest'); setOpenViewPopup(true); }}
+                                        onClick={() => { setSelectedRequest(request); setTypePopup('viewRequest'); setOpenViewPopup(true); }}
                                     >
                                         View Details
                                     </button>
@@ -226,12 +253,14 @@ function page() {
                 </div>
             </div>
 
-            {(selectedRequest || selectedRequestFromDoctor) && openViewPopup && (
+            {selectedRequest && openViewPopup && (
                 <ViewConsultantPopup
-                    request={selectedRequest || selectedRequestFromDoctor}
-                    onClose={() => { setOpenViewPopup(false); setSelectedRequest(null); setSelectedRequestFromDoctor(null); }}
+                    request={selectedRequest}
+                    onClose={() => { setOpenViewPopup(false); setSelectedRequest(null) }}
                     type={typePopup}
                     currentUser={currentUser}
+                    onReject={handleReject}
+                    onAccept={handleAccept}
                 />
             )}
 
