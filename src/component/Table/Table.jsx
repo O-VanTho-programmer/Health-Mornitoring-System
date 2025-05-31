@@ -25,37 +25,38 @@ function Table({ labels, data, keys, role, onViewDetail, onPay, setTypePopup, se
                                     </td>
                                 ))}
 
-                                <td className="w-[110px] flex gap-2">
-                                    <button
-                                        className="cursor-pointer group flex items-center px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 hover:gap-1 transition-all"
-                                        onClick={() => {
-                                            onViewDetail(row);
-                                            setOpenViewPopup(true);
-                                            setTypePopup('viewConsultant');
-                                        }}
-                                    >
-                                        <FaEye />
-                                        <span className="overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
-                                            View
-                                        </span>
-                                    </button>
-
-                                    {role === 'patient' && row.status === 'Accepted (Unpaid)' && (
+                                <td className="">
+                                    <div className='flex gap-2 min-w-[110px]'>
                                         <button
-                                            className="cursor-pointer group flex items-center px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 hover:gap-1 transition-all"
+                                            className="cursor-pointer group flex items-center px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 hover:gap-1 transition-all"
                                             onClick={() => {
-                                                onPay(row);
-                                                setOpenPaymentPopup(true)
+                                                onViewDetail(row);
+                                                setOpenViewPopup(true);
+                                                setTypePopup('viewConsultant');
                                             }}
                                         >
-                                            <FaMoneyCheck />
+                                            <FaEye />
                                             <span className="overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
-                                                Pay
+                                                View
                                             </span>
                                         </button>
-                                    )}
-                                </td>
 
+                                        {role === 'patient' && row.status === 'Accepted (Unpaid)' && (
+                                            <button
+                                                className="cursor-pointer group flex items-center px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 hover:gap-1 transition-all"
+                                                onClick={() => {
+                                                    onPay(row);
+                                                    setOpenPaymentPopup(true)
+                                                }}
+                                            >
+                                                <FaMoneyCheck />
+                                                <span className="overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
+                                                    Pay
+                                                </span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </td>
                             </tr>
                         ))
                     ) : (

@@ -241,7 +241,7 @@ app.get('/get_made_consultants_patient_doctor/:patient_id/:doctor_id', async (re
         (cr.sender_id = ? AND cr.receiver_id = ?)
         OR 
         (cr.sender_id = ? AND cr.receiver_id = ?)
-      ORDER BY cr.date DESC
+      ORDER BY cr.date_create DESC
     `;
 
     const [consultants] = await db.query(query, [patient_id, doctor_id, doctor_id, patient_id]);
@@ -273,7 +273,7 @@ app.get('/get_made_consultants_by_doctor_id/:doctor_id', async (req, res) => {
         (cr.receiver_id = ? AND cr.sender_id = u.user_id)
       WHERE 
         (cr.sender_id = ? OR cr.receiver_id = ?) 
-      ORDER BY cr.date DESC
+      ORDER BY cr.date_create DESC
     `;
 
     const [consultants] = await db.query(query, [doctor_id, doctor_id, doctor_id, doctor_id]);
@@ -303,7 +303,7 @@ app.get('/get_consultant_requests_by_doctor_id/:doctor_id', async (req, res) => 
       FROM consultant_request cr
       JOIN users u ON cr.sender_id = u.user_id
       WHERE cr.receiver_id = ? AND cr.receiver_role = 'doctor' AND cr.status = 'Pending'
-      ORDER BY cr.date DESC
+      ORDER BY cr.date_create DESC
     `;
 
     const [requests] = await db.query(query, [doctor_id]);
@@ -337,7 +337,7 @@ app.get('/get_consultant_request_to_patient/:patient_id', async (req, res) => {
         (cr.sender_role = 'doctor' AND cr.sender_id = u.user_id)
       WHERE 
         (cr.receiver_id = ? AND cr.receiver_role = 'patient')
-      ORDER BY cr.date DESC
+      ORDER BY cr.date_create DESC
     `;
 
     const [requests] = await db.query(query, [patient_id]);
@@ -466,7 +466,7 @@ app.get('/get_made_consultants_patient_side/:patient_id', async (req, res) => {
       WHERE 
         (cr.sender_id = ? AND cr.sender_role = 'patient') OR 
         (cr.receiver_id = ? AND cr.receiver_role = 'patient')
-      ORDER BY cr.date DESC
+      ORDER BY cr.date_create DESC
     `;
 
     const [consultants] = await db.query(query, [patient_id, patient_id]);
