@@ -3,7 +3,7 @@ import React from "react";
 export default function InformationCard({ user }) {
     return (
         <div className="mt-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{user.role === "patient" ? "Patient Role" : "Doctor Role"}</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{user.role === "patient" ? "Patient Information" : "Doctor Profile"}</h2>
 
             <div className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row gap-6">
                 <div className="flex flex-col items-center md:w-1/3 border-r border-gray-200 pr-6">

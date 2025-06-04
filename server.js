@@ -4,6 +4,9 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const path = require("path");
+const xlsx = require("xlsx");
+const fs = require("fs");
 
 const app = express();
 app.use(cors({
@@ -31,6 +34,8 @@ app.post('/sign_up', async (req, res) => {
 
   try {
     // Mã hóa mật khẩu
+    
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (!['patient', 'doctor'].includes(userType.trim().toLowerCase())) {
@@ -513,6 +518,72 @@ app.get('/get_patients_by_doctor_id/:doctor_id', async (req, res) => {
     return res.status(500).json({ message: "Server error while fetching assigned patients" });
   }
 });
+
+// Payment
+app.post("/pay_consultant", async (req, res) => {
+  try {
+    const {
+      patient_id,
+      doctor_id,
+      request_id,
+      patient_name,
+      doctor_name,
+      service,
+      date,
+      price,
+      payment_method,
+      card_number = "",
+      card_holder = "",
+      expiry = "",
+      cvc = "",
+    } = req.body;
+
+    const query = `
+      UPDATE consultant_request
+      SET status = 'Accepted'
+      WHERE request_id = ?
+    `
+
+    await db.query(query, [request_id]);
+
+    const row = {
+      "Patient ID": patient_id,
+      "Doctor ID": doctor_id,
+      "Request ID": request_id,
+      "Patient Name": patient_name,
+      "Doctor Name": doctor_name,
+      "Service": service,
+      "Date": date,
+      "Price": price,
+      "Payment Method": payment_method,
+      "Card Number": payment_method === "card" ? card_number : "",
+      "Card Holder": payment_method === "card" ? card_holder : "",
+      "Expiry": payment_method === "card" ? expiry : "",
+      "CVC": payment_method === "card" ? cvc : "",
+      "Created At": new Date().toLocaleString(),
+    };
+
+    const workbook = xlsx.utils.book_new();
+    const worksheet = xlsx.utils.json_to_sheet([row]);
+    xlsx.utils.book_append_sheet(workbook, worksheet, "Payments");
+
+    const fileName = `payment_${Date.now()}.xlsx`;
+    const dir = path.join(__dirname, "exports");
+    const filePath = path.join(dir, fileName);
+
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    xlsx.writeFile(workbook, filePath);
+
+    return res.status(200).json({
+      message: "Payment recorded successfully",
+      file: `/payment_records/${fileName}`,
+    });
+  } catch (err) {
+    console.error("Error in /pay_consultant:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 
 

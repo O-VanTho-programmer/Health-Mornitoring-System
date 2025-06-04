@@ -266,7 +266,7 @@ function page() {
 
             {selectedRequest && openPaymentPopup && (
                 <Payment
-                    onClose={() => { setOpenPaymentPopup(false); setSelectedRequest(null) }}
+                    onClose={() => { setOpenPaymentPopup(false); setSelectedRequest(null); getMadeConsultants() }}
                     data={selectedRequest}
                 />
             )}
