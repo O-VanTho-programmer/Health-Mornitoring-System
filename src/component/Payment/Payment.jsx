@@ -6,7 +6,7 @@ import Alert from "../Alert/Alert";
 export default function Payment({ onClose, data }) {
     const currentUser = useContext(UserContext);
     const [paymentMethod, setPaymentMethod] = useState("card");
-    
+
     const [alert, setAlert] = useState("");
     const [typeAlert, setTypeAlert] = useState("");
 
@@ -39,10 +39,19 @@ export default function Payment({ onClose, data }) {
         try {
             const res = await axios.post("http://localhost:5000/pay_consultant", payload);
             setAlert(res.data.message || "Payment success");
-            onClose(); // close popup
+            setTypeAlert("success");
+
+            onClose();
         } catch (err) {
             console.error(err);
+            setTypeAlert("danger");
             setAlert("Payment failed. Try again.");
+            setCardInfo({
+                card_number: "",
+                card_holder: "",
+                expiry: "",
+                cvc: "",
+            });
         }
     };
 
@@ -51,7 +60,7 @@ export default function Payment({ onClose, data }) {
             {alert && (
                 <Alert message={alert} type={typeAlert} onClose={() => setAlert("")} />
             )}
-            
+
             <div onClick={onClose} className="bg-black opacity-50 w-full h-full absolute top-0 left-0"></div>
             <div className="max-w-3xl w-[90%] bg-white rounded-lg shadow-lg p-6 z-10">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-6">Payment for Consultation</h2>
